@@ -156,21 +156,9 @@ public class ImGuiMainViewModel
 
     public void Render()
     {
-        RenderStatusWindow();
         UpdateSidebarAnimation();
         RenderSidebar();
         RenderMainContent();
-    }
-
-    private void RenderStatusWindow()
-    {
-        ImGui.SetNextWindowPos(new Vector2(12, 12), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowSize(new Vector2(360, 120), ImGuiCond.FirstUseEver);
-        ImGui.Begin("Peekaboo");
-        ImGui.Text("Peekaboo ImGui");
-        ImGui.Text($"Provider: {_settings.SelectedProvider}");
-        ImGui.Text(PermissionStatus);
-        ImGui.End();
     }
 
     private void UpdateSidebarAnimation()
@@ -184,8 +172,7 @@ public class ImGuiMainViewModel
     private void RenderSidebar()
     {
         var io = ImGui.GetIO();
-        var pos = ImGui.GetWindowPos();
-        var drawList = ImGui.GetWindowDrawList();
+        ImDrawListPtr drawList = default;
         var sidebarPos = Vector2.Zero;
 
         float windowHeight = io.DisplaySize.Y;
@@ -195,9 +182,10 @@ public class ImGuiMainViewModel
         ImGui.SetNextWindowSize(new Vector2(_sidebarWidth + 20, windowHeight));
         ImGui.SetNextWindowPos(new Vector2(0, 0));
         
-        ImGui.Begin("##sidebar", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar);
+        ImGui.Begin("##sidebar", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar);
         {
             sidebarPos = ImGui.GetWindowPos();
+            drawList = ImGui.GetWindowDrawList();
             
             drawList.AddRectFilled(
                 sidebarPos,
@@ -259,7 +247,7 @@ public class ImGuiMainViewModel
                 _isExpanded = !_isExpanded;
             }
             
-            if (io.MousePos.X > pos.X && io.MousePos.X < pos.X + _sidebarWidth + 10 &&
+            if (io.MousePos.X > sidebarPos.X && io.MousePos.X < sidebarPos.X + _sidebarWidth + 10 &&
                 io.MousePos.Y > 5 && io.MousePos.Y < windowHeight - 10)
             {
                 ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeEW);
@@ -302,12 +290,15 @@ public class ImGuiMainViewModel
 
     private bool Tab(string label, string icon, bool selected)
     {
-        var io = ImGui.GetIO();
-        var style = ImGui.GetStyle();
-        
         float tabWidth = _isExpanded ? _sidebarWidth - 30 : 50;
         float tabHeight = _isExpanded ? 40 : 35;
-        
+
+        var drawList = ImGui.GetWindowDrawList();
+        var itemMin = ImGui.GetCursorScreenPos();
+        var itemMax = new Vector2(itemMin.X + tabWidth, itemMin.Y + tabHeight);
+        bool clicked = ImGui.InvisibleButton("##" + label, new Vector2(tabWidth, tabHeight));
+        bool hovered = ImGui.IsItemHovered();
+
         Vector4 bgColor, textColor;
         
         if (selected)
@@ -315,7 +306,7 @@ public class ImGuiMainViewModel
             bgColor = new Vector4(0.15f, 0.15f, 0.2f, 1f);
             textColor = new Vector4(1f, 1f, 1f, 1f);
         }
-        else if (ImGui.IsItemHovered())
+        else if (hovered)
         {
             bgColor = new Vector4(0.1f, 0.1f, 0.12f, 1f);
             textColor = new Vector4(0.7f, 0.7f, 0.7f, 1f);
@@ -325,49 +316,38 @@ public class ImGuiMainViewModel
             bgColor = new Vector4(0, 0, 0, 0);
             textColor = new Vector4(0.5f, 0.5f, 0.5f, 1f);
         }
-        
-        var cursorPos = ImGui.GetCursorPos();
-        
-        var drawList = ImGui.GetWindowDrawList();
-        var itemMin = ImGui.GetItemRectMin();
-        var itemMax = ImGui.GetItemRectMax();
-        
+
         drawList.AddRectFilled(
-            new Vector2(itemMin.X, cursorPos.Y),
-            new Vector2(itemMin.X + tabWidth, cursorPos.Y + tabHeight),
+            itemMin,
+            itemMax,
             ImGui.GetColorU32(bgColor),
             4);
-        
+
+        uint textColorU32 = ImGui.GetColorU32(textColor);
         if (_isExpanded)
         {
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + 10, cursorPos.Y + 10));
-            ImGui.TextColored(textColor, icon);
-            ImGui.SameLine();
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + 35, cursorPos.Y + 12));
-            ImGui.TextColored(textColor, label);
+            drawList.AddText(new Vector2(itemMin.X + 10, itemMin.Y + 10), textColorU32, icon);
+            drawList.AddText(new Vector2(itemMin.X + 35, itemMin.Y + 12), textColorU32, label);
         }
         else
         {
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + 15, cursorPos.Y + 10));
-            ImGui.TextColored(textColor, icon);
+            drawList.AddText(new Vector2(itemMin.X + 15, itemMin.Y + 10), textColorU32, icon);
         }
-        
-        ImGui.SetCursorPos(new Vector2(cursorPos.X, cursorPos.Y + tabHeight));
-        
-        return ImGui.InvisibleButton("##" + label, new Vector2(tabWidth, tabHeight));
+
+        return clicked;
     }
 
     private void RenderMainContent()
     {
         var io = ImGui.GetIO();
         float mainX = _sidebarWidth + 20;
-        float mainWidth = io.DisplaySize.X - mainX - (_showToolHistory ? 300 : 0);
+        float mainWidth = Math.Max(320, io.DisplaySize.X - mainX - (_showToolHistory ? 300 : 0));
         float mainHeight = io.DisplaySize.Y;
         
         ImGui.SetNextWindowSize(new Vector2(mainWidth, mainHeight));
         ImGui.SetNextWindowPos(new Vector2(mainX, 0));
         
-        ImGui.Begin("##main", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse);
+        ImGui.Begin("##main", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse);
         {
             var pos = ImGui.GetWindowPos();
             var drawList = ImGui.GetWindowDrawList();
@@ -395,7 +375,7 @@ public class ImGuiMainViewModel
             
             ImGui.SetCursorPos(new Vector2(20, 80));
             float chatHeight = mainHeight - 180;
-            ImGui.BeginChild("##chat", new Vector2(mainWidth - 40, chatHeight), ImGuiChildFlags.Borders);
+            ImGui.BeginChild("##chat", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, chatHeight)), ImGuiChildFlags.Borders);
             {
                 foreach (var msg in ChatMessages)
                 {
@@ -405,7 +385,7 @@ public class ImGuiMainViewModel
             ImGui.EndChild();
             
             ImGui.SetCursorPos(new Vector2(20, mainHeight - 90));
-            ImGui.BeginChild("##inputarea", new Vector2(mainWidth - 120, 60), ImGuiChildFlags.Borders);
+            ImGui.BeginChild("##inputarea", new Vector2(Math.Max(1, mainWidth - 120), 60), ImGuiChildFlags.Borders);
             {
                 ImGui.InputTextMultiline("##input", ref _userInput, 500, new Vector2(mainWidth - 140, 50));
             }
@@ -485,7 +465,7 @@ public class ImGuiMainViewModel
         ImGui.SetNextWindowSize(new Vector2(width, height));
         ImGui.SetNextWindowPos(new Vector2(x, y));
         
-        ImGui.Begin("##toolhistory", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse);
+        ImGui.Begin("##toolhistory", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoCollapse);
         {
             var drawList = ImGui.GetWindowDrawList();
             var pos = ImGui.GetWindowPos();
