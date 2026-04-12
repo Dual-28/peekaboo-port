@@ -358,7 +358,7 @@ public class ImGuiMainViewModel
                 ImGui.GetColorU32(new Vector4(0.137f, 0.141f, 0.161f, 1f)));
             
             ImGui.SetCursorPos(new Vector2(20, 20));
-            ImGui.Text($"Session: {_sessionStore.CurrentSession?.Title ?? "New Session"}");
+            ImGui.Text(GetCurrentTabTitle());
             
             ImGui.SameLine(mainWidth - 150);
             ImGui.SetCursorPos(new Vector2(mainWidth - 130, 20));
@@ -373,38 +373,7 @@ public class ImGuiMainViewModel
                 _searchQuery = "";
             }
             
-            ImGui.SetCursorPos(new Vector2(20, 80));
-            float chatHeight = mainHeight - 180;
-            ImGui.BeginChild("##chat", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, chatHeight)), ImGuiChildFlags.Borders);
-            {
-                foreach (var msg in ChatMessages)
-                {
-                    RenderChatMessage(msg);
-                }
-            }
-            ImGui.EndChild();
-            
-            ImGui.SetCursorPos(new Vector2(20, mainHeight - 90));
-            ImGui.BeginChild("##inputarea", new Vector2(Math.Max(1, mainWidth - 120), 60), ImGuiChildFlags.Borders);
-            {
-                ImGui.InputTextMultiline("##input", ref _userInput, 500, new Vector2(mainWidth - 140, 50));
-            }
-            ImGui.EndChild();
-            
-            ImGui.SetCursorPos(new Vector2(mainWidth - 90, mainHeight - 85));
-            if (ImGui.Button("Send", new Vector2(60, 25)) && !_isProcessing && !string.IsNullOrWhiteSpace(_userInput))
-            {
-                SendMessage();
-            }
-            
-            if (_isProcessing)
-            {
-                ImGui.SetCursorPos(new Vector2(mainWidth - 90, mainHeight - 55));
-                if (ImGui.Button("Cancel", new Vector2(60, 20)))
-                {
-                    CancelTask();
-                }
-            }
+            RenderCurrentTab(mainWidth, mainHeight);
         }
         ImGui.End();
         
@@ -412,6 +381,147 @@ public class ImGuiMainViewModel
         {
             RenderToolHistoryPanel(mainX + mainWidth + 10, 0, 290, (int)mainHeight);
         }
+    }
+
+    private string GetCurrentTabTitle() => _currentTab switch
+    {
+        1 => "Running Apps",
+        2 => "Open Windows",
+        3 => "Tool History",
+        4 => "Settings",
+        _ => $"Session: {_sessionStore.CurrentSession?.Title ?? "New Session"}",
+    };
+
+    private void RenderCurrentTab(float mainWidth, float mainHeight)
+    {
+        switch (_currentTab)
+        {
+            case 1:
+                RenderAppsTab(mainWidth, mainHeight);
+                break;
+            case 2:
+                RenderWindowsTab(mainWidth, mainHeight);
+                break;
+            case 3:
+                RenderHistoryTab(mainWidth, mainHeight);
+                break;
+            case 4:
+                RenderSettingsTab(mainWidth, mainHeight);
+                break;
+            default:
+                RenderChatTab(mainWidth, mainHeight);
+                break;
+        }
+    }
+
+    private void RenderChatTab(float mainWidth, float mainHeight)
+    {
+        ImGui.SetCursorPos(new Vector2(20, 80));
+        float chatHeight = mainHeight - 180;
+        ImGui.BeginChild("##chat", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, chatHeight)), ImGuiChildFlags.Borders);
+        {
+            foreach (var msg in ChatMessages)
+            {
+                RenderChatMessage(msg);
+            }
+        }
+        ImGui.EndChild();
+
+        ImGui.SetCursorPos(new Vector2(20, mainHeight - 90));
+        ImGui.BeginChild("##inputarea", new Vector2(Math.Max(1, mainWidth - 120), 60), ImGuiChildFlags.Borders);
+        {
+            ImGui.InputTextMultiline("##input", ref _userInput, 500, new Vector2(Math.Max(1, mainWidth - 140), 50));
+        }
+        ImGui.EndChild();
+
+        ImGui.SetCursorPos(new Vector2(mainWidth - 90, mainHeight - 85));
+        if (ImGui.Button("Send", new Vector2(60, 25)) && !_isProcessing && !string.IsNullOrWhiteSpace(_userInput))
+        {
+            SendMessage();
+        }
+
+        if (_isProcessing)
+        {
+            ImGui.SetCursorPos(new Vector2(mainWidth - 90, mainHeight - 55));
+            if (ImGui.Button("Cancel", new Vector2(60, 20)))
+            {
+                CancelTask();
+            }
+        }
+    }
+
+    private void RenderAppsTab(float mainWidth, float mainHeight)
+    {
+        ImGui.SetCursorPos(new Vector2(20, 80));
+        if (ImGui.Button("Refresh Apps", new Vector2(120, 28)))
+        {
+            _ = Task.Run(LoadRunningApps);
+        }
+
+        ImGui.SetCursorPos(new Vector2(20, 120));
+        ImGui.BeginChild("##apps", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, mainHeight - 140)), ImGuiChildFlags.Borders);
+        {
+            foreach (var app in RunningApps)
+            {
+                var active = app.IsActive ? " *" : "";
+                if (ImGui.Selectable($"{app.Name}{active}  pid:{app.ProcessId}  windows:{app.WindowCount}"))
+                {
+                    _ = Task.Run(() => _apps.ActivateApplicationAsync(app.Name));
+                }
+            }
+        }
+        ImGui.EndChild();
+    }
+
+    private void RenderWindowsTab(float mainWidth, float mainHeight)
+    {
+        ImGui.SetCursorPos(new Vector2(20, 80));
+        if (ImGui.Button("Refresh Windows", new Vector2(140, 28)))
+        {
+            _ = Task.Run(LoadOpenWindows);
+        }
+
+        ImGui.SetCursorPos(new Vector2(20, 120));
+        ImGui.BeginChild("##windows", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, mainHeight - 140)), ImGuiChildFlags.Borders);
+        {
+            foreach (var window in OpenWindows)
+            {
+                var appName = window.ProcessName ?? "unknown";
+                var marker = window.IsMainWindow ? " *" : "";
+                if (ImGui.Selectable($"{window.Title}{marker}  [{appName}]"))
+                {
+                    _ = Task.Run(() => _windows.FocusWindowAsync(new WindowTarget.Title(window.Title)));
+                }
+            }
+        }
+        ImGui.EndChild();
+    }
+
+    private void RenderHistoryTab(float mainWidth, float mainHeight)
+    {
+        ImGui.SetCursorPos(new Vector2(20, 80));
+        ImGui.BeginChild("##historytab", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, mainHeight - 100)), ImGuiChildFlags.Borders);
+        {
+            foreach (var tool in ToolHistory)
+            {
+                RenderToolEntry(tool);
+            }
+        }
+        ImGui.EndChild();
+    }
+
+    private void RenderSettingsTab(float mainWidth, float mainHeight)
+    {
+        ImGui.SetCursorPos(new Vector2(20, 80));
+        ImGui.BeginChild("##settingstab", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, mainHeight - 100)), ImGuiChildFlags.Borders);
+        {
+            ImGui.Text($"Provider: {_settings.SelectedProvider}");
+            ImGui.Text($"Model: {_settings.SelectedModel}");
+            ImGui.Text(PermissionStatus);
+            ImGui.Separator();
+            ImGui.TextWrapped("Edit provider settings from the WPF settings window for now.");
+        }
+        ImGui.EndChild();
     }
 
     private void RenderChatMessage(ChatMessageEntry msg)
