@@ -1,0 +1,23 @@
+{
+  "id": "imgui-menu14-peekaboo-06",
+  "seq": "06",
+  "title": "Integrate ImGui rendering into Peekaboo's main window or overlay",
+  "status": "pending",
+  "depends_on": ["05"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/**/*.cs",
+    "Peekaboo-Windows/Peekaboo.Gui.Wpf/Peekaboo.Gui.Wpf.csproj"
+  ],
+  "acceptance_criteria": [
+    "ImGui renders in Peekaboo application window/overlay",
+    "No crashes on startup or resize",
+    "dotnet build and run succeeds, UI visible",
+    "dotnet test passes if applicable"
+  ],
+  "deliverables": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/ImGui/ImGuiIntegration.cs"
+  ]
+}

@@ -1,0 +1,1 @@
+// WPF converters removed - ImGui version doesn't use them

@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E93384AA-6976-4C6A-896E-8AA86460DFE3}|Peekaboo.Core\\Peekaboo.Core.csproj|c:\\users\\dualtach\\documents\\aasolitude\\peekaboo-main\\peekaboo-windows\\peekaboo.core\\ipermissionsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E93384AA-6976-4C6A-896E-8AA86460DFE3}|Peekaboo.Core\\Peekaboo.Core.csproj|solutionrelative:peekaboo.core\\ipermissionsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "IPermissionsService.cs",
+              "DocumentMoniker": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\IPermissionsService.cs",
+              "RelativeDocumentMoniker": "Peekaboo.Core\\IPermissionsService.cs",
+              "ToolTip": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\IPermissionsService.cs",
+              "RelativeToolTip": "Peekaboo.Core\\IPermissionsService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-11T01:18:49.049Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

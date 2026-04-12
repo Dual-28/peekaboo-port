@@ -1,0 +1,12 @@
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\bin\Debug\net10.0\Peekaboo.Core.deps.json
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\bin\Debug\net10.0\Peekaboo.Core.dll
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\bin\Debug\net10.0\Peekaboo.Core.pdb
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\obj\Debug\net10.0\Peekaboo.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\obj\Debug\net10.0\Peekaboo.Core.AssemblyInfoInputs.cache
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\obj\Debug\net10.0\Peekaboo.Core.AssemblyInfo.cs
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\obj\Debug\net10.0\Peekaboo.Core.csproj.CoreCompileInputs.cache
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\obj\Debug\net10.0\Peekaboo.Core.sourcelink.json
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\obj\Debug\net10.0\Peekaboo.Core.dll
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\obj\Debug\net10.0\refint\Peekaboo.Core.dll
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\obj\Debug\net10.0\Peekaboo.Core.pdb
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Core\obj\Debug\net10.0\ref\Peekaboo.Core.dll

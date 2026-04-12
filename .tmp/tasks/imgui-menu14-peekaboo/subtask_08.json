@@ -1,0 +1,23 @@
+{
+  "id": "imgui-menu14-peekaboo-08",
+  "seq": "08",
+  "title": "Add unit and integration tests for ImGui UI and service bindings",
+  "status": "pending",
+  "depends_on": ["07"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/Peekaboo.Platform.Windows.csproj"
+  ],
+  "acceptance_criteria": [
+    "Tests cover UI rendering, interactions, service updates",
+    "dotnet test passes with >80% coverage on ImGui code",
+    "No regressions in existing tests",
+    "Standalone demo matches example 14 visually"
+  ],
+  "deliverables": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/ImGui/ImGuiManagerTests.cs",
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/ImGui/ServiceControlsTests.cs"
+  ]
+}

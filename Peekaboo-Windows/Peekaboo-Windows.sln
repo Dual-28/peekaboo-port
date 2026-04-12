@@ -1,0 +1,37 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peekaboo.Core", "Peekaboo.Core\Peekaboo.Core.csproj", "{E93384AA-6976-4C6A-896E-8AA86460DFE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peekaboo.Platform.Windows", "Peekaboo.Platform.Windows\Peekaboo.Platform.Windows.csproj", "{EB9E402A-3830-4636-AE00-531C707B3F4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peekaboo.Cli", "Peekaboo.Cli\Peekaboo.Cli.csproj", "{7BDCC826-E3CF-42DA-8759-C7D3B0216511}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peekaboo.McpServer", "Peekaboo.McpServer\Peekaboo.McpServer.csproj", "{7273EE52-0910-4A62-8246-B24DBC04E77A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E93384AA-6976-4C6A-896E-8AA86460DFE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E93384AA-6976-4C6A-896E-8AA86460DFE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E93384AA-6976-4C6A-896E-8AA86460DFE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E93384AA-6976-4C6A-896E-8AA86460DFE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB9E402A-3830-4636-AE00-531C707B3F4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB9E402A-3830-4636-AE00-531C707B3F4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB9E402A-3830-4636-AE00-531C707B3F4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB9E402A-3830-4636-AE00-531C707B3F4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BDCC826-E3CF-42DA-8759-C7D3B0216511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BDCC826-E3CF-42DA-8759-C7D3B0216511}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BDCC826-E3CF-42DA-8759-C7D3B0216511}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BDCC826-E3CF-42DA-8759-C7D3B0216511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7273EE52-0910-4A62-8246-B24DBC04E77A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7273EE52-0910-4A62-8246-B24DBC04E77A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7273EE52-0910-4A62-8246-B24DBC04E77A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7273EE52-0910-4A62-8246-B24DBC04E77A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,28 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+overrides:
+  oracle: link:../oracle
+  '@steipete/oracle': link:../oracle
+
+importers:
+
+  .:
+    devDependencies:
+      chrome-devtools-mcp:
+        specifier: 0.12.1
+        version: 0.12.1
+
+packages:
+
+  chrome-devtools-mcp@0.12.1:
+    resolution: {integrity: sha512-QREfGxJVVlBrjKdyis9px6UHyXix+Rre9nCkqX7CY7GsU8c6azOwwV8inQB8E3h2/QGqi4sCSF8fmjfAvmE07Q==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=23}
+    hasBin: true
+
+snapshots:
+
+  chrome-devtools-mcp@0.12.1: {}

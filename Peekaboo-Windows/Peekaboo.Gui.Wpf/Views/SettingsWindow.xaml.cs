@@ -1,0 +1,1 @@
+// WPF SettingsWindow removed - ImGui version handles settings in main UI

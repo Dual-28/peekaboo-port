@@ -1,0 +1,22 @@
+{
+  "id": "imgui-menu14-peekaboo-05",
+  "seq": "05",
+  "title": "Create main menu layout with tabs, panels, and controls matching example 14",
+  "status": "pending",
+  "depends_on": ["04"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "ImGuiMenu-s/14/imgui_impl_win32.cpp"
+  ],
+  "acceptance_criteria": [
+    "Menu tabs and panels render as in example 14",
+    "Custom widgets used in layout",
+    "Interactive elements respond (buttons, sliders)",
+    "dotnet build succeeds"
+  ],
+  "deliverables": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/ImGui/MenuUI.cs"
+  ]
+}

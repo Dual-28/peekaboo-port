@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Peekaboo.Cli": {
+      "commandName": "Project"
+    },
+    "Profile 1": {
+      "commandName": "Project"
+    }
+  }
+}

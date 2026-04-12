@@ -1,0 +1,22 @@
+{
+  "id": "imgui-menu14-peekaboo-04",
+  "seq": "04",
+  "title": "Implement custom widgets, rotations, and drawing helpers from example 14",
+  "status": "pending",
+  "depends_on": ["03"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "ImGuiMenu-s/14/imgui_rotate.hpp",
+    ".tmp/external-context/dear-imgui/custom-widgets-styling.md"
+  ],
+  "acceptance_criteria": [
+    "Rotation functions and custom drawing implemented",
+    "Custom widgets render correctly with fonts",
+    "dotnet build succeeds"
+  ],
+  "deliverables": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/ImGui/CustomWidgets.cs"
+  ]
+}

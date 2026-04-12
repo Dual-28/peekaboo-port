@@ -1,0 +1,26 @@
+{
+  "id": "imgui-menu14-peekaboo-02",
+  "seq": "02",
+  "title": "Implement ImGui context initialization and basic demo window with example 14 style",
+  "status": "in_progress",
+    "agent_id": "CoderAgent",
+    "started_at": "2026-04-11T12:00:00Z",
+  "depends_on": ["01"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "ImGuiMenu-s/14/imgui_impl_win32.cpp",
+    "ImGuiMenu-s/14/imgui_impl_dx9.cpp",
+    ".tmp/external-context/dear-imgui/win32-dx9-backend-setup.md"
+  ],
+  "acceptance_criteria": [
+    "ImGui context created and backend initialized (Win32 + GL/DX)",
+    "Basic demo window renders with style/colors matching example 14",
+    "dotnet build succeeds",
+    "Window shows ImGui demo without crashes"
+  ],
+  "deliverables": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/ImGui/ImGuiManager.cs"
+  ]
+}

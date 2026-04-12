@@ -1,0 +1,1 @@
+// WPF App.xaml.cs removed - ImGui version uses ImGuiProgram.cs

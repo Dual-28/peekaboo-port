@@ -1,0 +1,23 @@
+{
+  "id": "imgui-menu14-peekaboo-07",
+  "seq": "07",
+  "title": "Bind Peekaboo core services to ImGui controls (toggles, configs)",
+  "status": "pending",
+  "depends_on": ["06"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "Peekaboo-Windows/Peekaboo.Core/I*.cs",
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/**/*.cs"
+  ],
+  "acceptance_criteria": [
+    "UI toggles/sliders update services (e.g., ScreenCapture enable/disable)",
+    "Service state reflected in UI",
+    "Changes persist or update in real-time",
+    "dotnet build succeeds"
+  ],
+  "deliverables": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/ImGui/ServiceControls.cs"
+  ]
+}

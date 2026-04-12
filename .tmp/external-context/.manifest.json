@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-04-11T12:00:00Z",
+  "libraries": {
+    "dear-imgui": {
+      "files": [
+        {
+          "filename": "win32-dx9-backend-setup.md",
+          "topic": "Win32 + DirectX9 backend setup",
+          "tech_stack": "Win32 DX9",
+          "fetched": "2026-04-11T12:00:00Z",
+          "source": "Official GitHub"
+        },
+        {
+          "filename": "custom-fonts-icons.md",
+          "topic": "Custom fonts binary compressed icons FA Ubuntu",
+          "tech_stack": "",
+          "fetched": "2026-04-11T12:00:00Z",
+          "source": "Official GitHub"
+        },
+        {
+          "filename": "custom-widgets-styling.md",
+          "topic": "Custom widgets styling rotate tabs panels",
+          "tech_stack": "",
+          "fetched": "2026-04-11T12:00:00Z",
+          "source": "Official GitHub"
+        }
+      ]
+    },
+    "imgui-net": {
+      "files": [
+        {
+          "filename": "csharp-bindings.md",
+          "topic": "C# ImGui.NET bindings backends",
+          "tech_stack": "C# .NET",
+          "fetched": "2026-04-11T12:00:00Z",
+          "source": "Official GitHub"
+        }
+      ]
+    }
+  }
+}

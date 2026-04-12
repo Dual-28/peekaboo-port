@@ -1,0 +1,16 @@
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\bin\Debug\net9.0-windows\Peekaboo.Platform.Windows.deps.json
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\bin\Debug\net9.0-windows\Peekaboo.Platform.Windows.dll
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\bin\Debug\net9.0-windows\Peekaboo.Platform.Windows.pdb
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\bin\Debug\net9.0-windows\Peekaboo.Core.dll
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\bin\Debug\net9.0-windows\Peekaboo.Core.pdb
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\Peekaboo.Platform.Windows.csproj.AssemblyReference.cache
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\Peekaboo.Platform.Windows.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\Peekaboo.Platform.Windows.AssemblyInfoInputs.cache
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\Peekaboo.Platform.Windows.AssemblyInfo.cs
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\Peekaboo.Platform.Windows.csproj.CoreCompileInputs.cache
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\Peekaboo.Platform.Windows.sourcelink.json
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\Peekaboo.D87B3774.Up2Date
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\Peekaboo.Platform.Windows.dll
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\refint\Peekaboo.Platform.Windows.dll
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\Peekaboo.Platform.Windows.pdb
+C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Platform.Windows\obj\Debug\net9.0-windows\ref\Peekaboo.Platform.Windows.dll

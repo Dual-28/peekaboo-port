@@ -1,0 +1,28 @@
+{
+  "id": "imgui-menu14-peekaboo-03",
+  "seq": "03",
+  "title": "Port and load custom fonts (Ubuntu, FontAwesome Pro) from example 14",
+  "status": "in_progress",\n  "agent_id": "coder-agent",\n  "started_at": "2026-04-11T12:00:00Z",
+  "depends_on": ["02"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "ImGuiMenu-s/14/UbuntuMed.hpp",
+    "ImGuiMenu-s/14/UbuntuItalic.hpp",
+    "ImGuiMenu-s/14/faprosolid.hpp",
+    "ImGuiMenu-s/14/faproreg.hpp",
+    "ImGuiMenu-s/14/faprolight.hpp",
+    "ImGuiMenu-s/14/hashes.h",
+    ".tmp/external-context/dear-imgui/custom-fonts-icons.md"
+  ],
+  "acceptance_criteria": [
+    "Custom fonts loaded and applied to ImGui style",
+    "FontAwesome icons render using hashes",
+    "Fonts match visual style of example 14",
+    "dotnet build succeeds"
+  ],
+  "deliverables": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/ImGui/Fonts.cs"
+  ]
+}

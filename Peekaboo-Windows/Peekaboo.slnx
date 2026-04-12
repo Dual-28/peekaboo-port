@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Peekaboo.Cli/Peekaboo.Cli.csproj" />
+  <Project Path="Peekaboo.Core/Peekaboo.Core.csproj" />
+  <Project Path="Peekaboo.McpServer/Peekaboo.McpServer.csproj" />
+  <Project Path="Peekaboo.Platform.Windows/Peekaboo.Platform.Windows.csproj" />
+  <Project Path="Peekaboo.Gui.Wpf/Peekaboo.Gui.Wpf.csproj" />
+</Solution>

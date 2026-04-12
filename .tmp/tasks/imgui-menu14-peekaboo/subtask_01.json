@@ -1,0 +1,24 @@
+{
+  "id": "imgui-menu14-peekaboo-01",
+  "seq": "01",
+  "title": "Add ImGui.NET and Silk.NET NuGet packages to project",
+  "status": "in_progress", "agent_id": "coder-agent", "started_at": "2026-04-11T12:00:00Z",
+  "depends_on": [],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/Peekaboo.Platform.Windows.csproj",
+    "Peekaboo-Windows/Peekaboo.Gui.Wpf/Peekaboo.Gui.Wpf.csproj",
+    ".tmp/external-context/imgui-net/csharp-bindings.md"
+  ],
+  "acceptance_criteria": [
+    "ImGui.NET NuGet package referenced in csproj",
+    "Silk.NET.OpenGL, Silk.NET.Windowing, Silk.NET.Input, Silk.NET.GLFW NuGet packages added",
+    "dotnet restore succeeds without errors",
+    "dotnet build succeeds without errors"
+  ],
+  "deliverables": [
+    "Peekaboo-Windows/Peekaboo.Platform.Windows/Peekaboo.Platform.Windows.csproj"
+  ]
+}

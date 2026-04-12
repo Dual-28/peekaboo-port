@@ -1,0 +1,348 @@
+<Window x:Class="Peekaboo.Gui.Wpf.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Peekaboo.Gui.Wpf.ViewModels"
+        xmlns:views="clr-namespace:Peekaboo.Gui.Wpf.Views"
+        Title="Peekaboo - Windows Automation Agent"
+        Width="1280" Height="800"
+        Background="#1E1E1E"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI, Consolas">
+
+    <Window.Resources>
+        <!-- Dark theme colors -->
+        <SolidColorBrush x:Key="BgPrimary" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="BgSecondary" Color="#252526"/>
+        <SolidColorBrush x:Key="BgTertiary" Color="#2D2D30"/>
+        <SolidColorBrush x:Key="BgHover" Color="#3E3E42"/>
+        <SolidColorBrush x:Key="Accent" Color="#007ACC"/>
+        <SolidColorBrush x:Key="AccentHover" Color="#1A8ADE"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="#D4D4D4"/>
+        <SolidColorBrush x:Key="TextSecondary" Color="#808080"/>
+        <SolidColorBrush x:Key="TextMuted" Color="#6A6A6A"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#3E3E42"/>
+        <SolidColorBrush x:Key="UserBubble" Color="#005A9E"/>
+        <SolidColorBrush x:Key="AssistantBubble" Color="#2D2D30"/>
+        <SolidColorBrush x:Key="ToolBubble" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="SystemBubble" Color="#3E3E42"/>
+        <SolidColorBrush x:Key="Success" Color="#4EC9B0"/>
+        <SolidColorBrush x:Key="Error" Color="#F44747"/>
+        <SolidColorBrush x:Key="Warning" Color="#D4A72C"/>
+
+        <!-- User message template -->
+        <DataTemplate x:Key="UserMessageTemplate">
+            <Border Background="{StaticResource UserBubble}" CornerRadius="8" Padding="12,10" Margin="40,4,8,4" HorizontalAlignment="Right" MaxWidth="700">
+                <TextBlock Text="{Binding Content}" TextWrapping="Wrap" Foreground="White" FontSize="13"/>
+            </Border>
+        </DataTemplate>
+
+        <!-- Assistant message template -->
+        <DataTemplate x:Key="AssistantMessageTemplate">
+            <Border Background="{StaticResource AssistantBubble}" CornerRadius="8" Padding="12,10" Margin="8,4,40,4" HorizontalAlignment="Left" MaxWidth="700">
+                <TextBlock Text="{Binding Content}" TextWrapping="Wrap" Foreground="{StaticResource TextPrimary}" FontSize="13"/>
+            </Border>
+        </DataTemplate>
+
+        <!-- System message template -->
+        <DataTemplate x:Key="SystemMessageTemplate">
+            <Border Background="{StaticResource SystemBubble}" CornerRadius="4" Padding="10,6" Margin="20,2,20,2" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Content}" TextWrapping="Wrap" Foreground="{StaticResource Warning}" FontSize="12" FontStyle="Italic"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <!-- Tool execution template -->
+        <DataTemplate x:Key="ToolMessageTemplate">
+            <Border Background="{StaticResource ToolBubble}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1,0,0,0" Padding="12,6" Margin="8,2,40,2" HorizontalAlignment="Left" MaxWidth="600">
+                <TextBlock Text="{Binding Content}" TextWrapping="Wrap" Foreground="{StaticResource Success}" FontSize="12" FontFamily="Consolas"/>
+            </Border>
+        </DataTemplate>
+
+        <!-- Message selector -->
+        <views:MessageTemplateSelector x:Key="MessageTemplateSelector"
+            UserTemplate="{StaticResource UserMessageTemplate}"
+            AssistantTemplate="{StaticResource AssistantMessageTemplate}"
+            SystemTemplate="{StaticResource SystemMessageTemplate}"
+            ToolTemplate="{StaticResource ToolMessageTemplate}"/>
+
+        <!-- Scrollbar style -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="Background" Value="{StaticResource BgTertiary}"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Sidebar: Sessions -->
+            <ColumnDefinition Width="240"/>
+            <!-- Main content -->
+            <ColumnDefinition Width="*"/>
+            <!-- Tool history panel -->
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ═══════════ LEFT SIDEBAR ═══════════ -->
+        <Border Grid.Column="0" Background="{StaticResource BgSecondary}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="48"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border Grid.Row="0" Background="{StaticResource BgTertiary}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+                    <Grid Margin="12,0">
+                        <TextBlock Text="Peekaboo" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                        <Button Content="⚙️" Width="28" Height="28" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="Transparent" BorderBrush="Transparent" Foreground="{StaticResource TextSecondary}"
+                                Command="{Binding OpenSettingsCommand}" Cursor="Hand" ToolTip="Settings"
+                                FontSize="14"/>
+                    </Grid>
+                </Border>
+
+                <!-- New Session button -->
+                <Button Grid.Row="1" Content="+ New Session" Margin="8,8" Padding="8,6"
+                        Background="{StaticResource Accent}" Foreground="White" BorderBrush="Transparent"
+                        Command="{Binding NewSessionCommand}" Cursor="Hand" FontSize="13" FontWeight="SemiBold"/>
+
+                <!-- Session list -->
+                <ListBox Grid.Row="2" ItemsSource="{Binding Sessions}" SelectedItem="{Binding SelectedSession}"
+                         Background="Transparent" BorderThickness="0" Foreground="{StaticResource TextPrimary}"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="12,8"/>
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource BgHover}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource BgHover}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" FontSize="13" Foreground="{StaticResource TextPrimary}"/>
+                                <TextBlock Text="{Binding ModelName}" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Permissions status -->
+                <Border Grid.Row="3" Background="{StaticResource BgTertiary}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="10,8">
+                    <StackPanel>
+                        <TextBlock FontSize="11" Foreground="{Binding IsFullyCapable, Converter={StaticResource BoolToPermissionColor}}" Text="{Binding PermissionStatus}" TextWrapping="Wrap"/>
+                        <Button Content="Delete Session" Margin="0,4,0,0" Padding="6,4" FontSize="11"
+                                Background="{StaticResource BgHover}" Foreground="{StaticResource Error}" BorderBrush="Transparent"
+                                Command="{Binding DeleteSessionCommand}" Cursor="Hand"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════ MAIN CHAT AREA ═══════════ -->
+        <Grid Grid.Column="1" Background="{StaticResource BgPrimary}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header with window title + clear button -->
+            <Border Grid.Row="0" Background="{StaticResource BgSecondary}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Auto-save indicator -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SelectedSession.Title}" Foreground="{StaticResource TextPrimary}" FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock Text=" • Saved" Foreground="{StaticResource Success}" FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center"
+                                   Visibility="{Binding SelectedSession, Converter={StaticResource NullToVisibility}}"/>
+                    </StackPanel>
+                    
+                    <!-- Search box -->
+                    <TextBox Grid.Column="2" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                             Background="{StaticResource BgTertiary}" Foreground="{StaticResource TextPrimary}"
+                             BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="8,4"
+                             FontSize="11" VerticalContentAlignment="Center">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Background">
+                                            <Setter.Value>
+                                                <VisualBrush Stretch="None" AlignmentX="Left">
+                                                    <VisualBrush.Visual>
+                                                        <TextBlock Text="  🔍 Search..." Foreground="{StaticResource TextMuted}" FontSize="11" Margin="8,0"/>
+                                                    </VisualBrush.Visual>
+                                                </VisualBrush>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    
+                    <!-- Clear chat button -->
+                    <Button Grid.Column="3" Content="🗑️ Clear Chat" Padding="8,4"
+                            Background="Transparent" Foreground="{StaticResource TextSecondary}"
+                            BorderBrush="Transparent" Cursor="Hand"
+                            Command="{Binding ClearChatCommand}" FontSize="11" Margin="8,0,0,0"/>
+                </Grid>
+            </Border>
+
+            <!-- Chat messages -->
+            <ScrollViewer Grid.Row="1" x:Name="ChatScrollViewer" VerticalScrollBarVisibility="Auto" Padding="8">
+                <ItemsControl ItemsSource="{Binding ChatMessages}"
+                              ItemTemplateSelector="{StaticResource MessageTemplateSelector}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- Search results overlay -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="8"
+                          Visibility="{Binding ShowSearchResults, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel>
+                    <TextBlock Text="Search Results" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,0,0,8"/>
+                    <ItemsControl ItemsSource="{Binding FilteredMessages}"
+                                  ItemTemplateSelector="{StaticResource MessageTemplateSelector}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Processing indicator -->
+            <Border Grid.Row="2" Background="{StaticResource BgSecondary}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="12,8" Visibility="{Binding IsProcessing, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding CurrentTool}" Foreground="{StaticResource Success}" FontSize="12" FontWeight="SemiBold" Visibility="{Binding CurrentTool, Converter={StaticResource StringToVisibility}}"/>
+                    <TextBlock Text="{Binding CurrentToolArgs}" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="8,0,0,0" TextTrimming="CharacterEllipsis" MaxWidth="300" Visibility="{Binding CurrentToolArgs, Converter={StaticResource StringToVisibility}}"/>
+                    <TextBlock Text="{Binding ThinkingContent}" Foreground="{StaticResource Warning}" FontSize="12" FontStyle="Italic" Visibility="{Binding IsThinking, Converter={StaticResource BoolToVisibility}}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Input area -->
+            <Border Grid.Row="3" Background="{StaticResource BgSecondary}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" Text="{Binding UserInput, UpdateSourceTrigger=PropertyChanged}"
+                             Background="{StaticResource BgTertiary}" Foreground="{StaticResource TextPrimary}"
+                             BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="10,8"
+                             FontSize="13" AcceptsReturn="True" VerticalContentAlignment="Center"
+                             TextWrapping="NoWrap">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Return" Modifiers="Ctrl" Command="{Binding SendCommand}"/>
+                            <KeyBinding Key="Escape" Command="{Binding CancelCommand}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button Grid.Column="1" Content="Send" Margin="8,0,0,0" Padding="16,8"
+                            Background="{StaticResource Accent}" Foreground="White" BorderBrush="Transparent"
+                            Command="{Binding SendCommand}" Cursor="Hand" FontSize="13" FontWeight="SemiBold"/>
+                    <Button Grid.Column="2" Content="Cancel" Margin="8,0,0,0" Padding="16,8"
+                            Background="{StaticResource Error}" Foreground="White" BorderBrush="Transparent"
+                            Command="{Binding CancelCommand}" Cursor="Hand" FontSize="13" FontWeight="SemiBold"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ═══════════ RIGHT PANEL: TOOL HISTORY ═══════════ -->
+        <Border Grid.Column="2" Background="{StaticResource BgSecondary}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1,0,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="48"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border Grid.Row="0" Background="{StaticResource BgTertiary}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1">
+                    <Grid Margin="12,0">
+                        <TextBlock Text="Tool Execution" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                        <Button Content="✕" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Background="Transparent" BorderBrush="Transparent" Foreground="{StaticResource TextSecondary}"
+                                Command="{Binding ToggleToolHistoryCommand}" Cursor="Hand" FontSize="12"/>
+                    </Grid>
+                </Border>
+
+                <!-- Tool history list -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="8">
+                    <ItemsControl ItemsSource="{Binding ToolHistory}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource BgTertiary}" CornerRadius="4" Padding="8,6" Margin="0,0,0,4">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontSize="14" Margin="0,0,6,0">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource ToolNameToIcon}">
+                                                        <Binding Path="ToolName"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding ToolName}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                            <TextBlock Text="{Binding IsRunning, Converter={StaticResource BoolToStatusText}}" FontSize="10" Margin="6,0,0,0" VerticalAlignment="Center">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{StaticResource Warning}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSuccess}" Value="True">
+                                                                <Setter Property="Foreground" Value="{StaticResource Success}"/>
+                                                                <Setter Property="Text" Value="✓"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsSuccess}" Value="False">
+                                                                <Setter Property="Foreground" Value="{StaticResource Error}"/>
+                                                                <Setter Property="Text" Value="✗"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Arguments}" FontSize="10" Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{Binding Duration, StringFormat={}{0:F1}s}" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0" Visibility="{Binding Duration, Converter={StaticResource NullToVisibility}}"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
