@@ -5,9 +5,8 @@
     <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>false</UseWPF>
+    <UseWPF>true</UseWPF>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <StartupObject>Peekaboo.Gui.Wpf.ImGuiProgram</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +23,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Peekaboo.Core\Peekaboo.Core.csproj" />
     <ProjectReference Include="..\Peekaboo.Platform.Windows\Peekaboo.Platform.Windows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ImGui\**\*.cs" />
+    <Compile Remove="ImGuiProgram.cs" />
   </ItemGroup>
 
 </Project>
