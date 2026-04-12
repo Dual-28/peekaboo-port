@@ -53,22 +53,22 @@ public sealed class WindowsTaskbarService : ITaskbarService
 
                     // Check if process has a main window
                     if (proc.MainWindowHandle != 0)
-                    {
-                        var title = proc.MainWindowTitle;
-                        if (!string.IsNullOrEmpty(title))
                         {
-                            items.Add(new TaskbarItemInfo(
-                                Id: $"taskbar_{index}",
-                                Name: title,
-                                ProcessName: proc.ProcessName,
-                                ProcessId: proc.Id,
-                                IsActive: proc.MainWindowHandle == User32.GetForegroundWindow(),
-                                IsPinned: false, // Would need registry check
-                                WindowHandle: proc.MainWindowHandle
-                            ));
-                            index++;
+                            var title = proc.MainWindowTitle;
+                            if (!string.IsNullOrEmpty(title))
+                            {
+                                // Use stable ID based on process ID and window handle
+                                items.Add(new TaskbarItemInfo(
+                                    Id: $"taskbar_{proc.Id}_{proc.MainWindowHandle:X}",
+                                    Name: title,
+                                    ProcessName: proc.ProcessName,
+                                    ProcessId: proc.Id,
+                                    IsActive: proc.MainWindowHandle == User32.GetForegroundWindow(),
+                                    IsPinned: false,
+                                    WindowHandle: proc.MainWindowHandle
+                                ));
+                            }
                         }
-                    }
                 }
                 catch
                 {
@@ -90,25 +90,40 @@ public sealed class WindowsTaskbarService : ITaskbarService
 
         try
         {
-            // Parse item ID to get window handle
+            // Handle new stable ID format: taskbar_{ProcessId}_{WindowHandle:X}
             if (itemId.StartsWith("taskbar_"))
             {
-                var indexStr = itemId.Replace("taskbar_", "");
-                if (int.TryParse(indexStr, out int index))
+                var parts = itemId.Replace("taskbar_", "").Split('_');
+                if (parts.Length == 2 && int.TryParse(parts[0], out int pid))
                 {
-                    var items = ListTaskbarItemsAsync(ct).Result;
-                    if (index < items.Count)
+                    // Try to find the process and its main window
+                    var proc = Process.GetProcesses().FirstOrDefault(p => p.Id == pid && p.MainWindowHandle != 0);
+                    if (proc != null)
                     {
-                        var item = items[index];
-                        // Restore and activate the window
-                        User32.ShowWindow(item.WindowHandle, 9); // SW_RESTORE
-                        User32.SetForegroundWindow(item.WindowHandle);
+                        User32.ShowWindow(proc.MainWindowHandle, 9);
+                        User32.SetForegroundWindow(proc.MainWindowHandle);
                         return Task.CompletedTask;
+                    }
+                }
+                else
+                {
+                    // Legacy index-based format for backward compatibility
+                    var indexStr = itemId.Replace("taskbar_", "");
+                    if (int.TryParse(indexStr, out int index))
+                    {
+                        var items = ListTaskbarItemsAsync(ct).Result;
+                        if (index < items.Count)
+                        {
+                            var item = items[index];
+                            User32.ShowWindow(item.WindowHandle, 9);
+                            User32.SetForegroundWindow(item.WindowHandle);
+                            return Task.CompletedTask;
+                        }
                     }
                 }
             }
 
-            // Try to find by window title if not index
+            // Try to find by window title
             var hwnd = FindWindowByTitle(itemId);
             if (hwnd != 0)
             {
