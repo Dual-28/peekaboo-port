@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("Peekaboo.Core")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Peekaboo.McpServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+62940258a01c9c3df8ccf2bdbe58449c81dbfcf7")]
-[assembly: System.Reflection.AssemblyProductAttribute("Peekaboo.Core")]
-[assembly: System.Reflection.AssemblyTitleAttribute("Peekaboo.Core")]
+[assembly: System.Reflection.AssemblyProductAttribute("Peekaboo.McpServer")]
+[assembly: System.Reflection.AssemblyTitleAttribute("Peekaboo.McpServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 [assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
 [assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]

@@ -91,7 +91,7 @@ public class PeekabooAgentService : IAgentService
 
                 // Execute tool
                 var startTime = DateTime.Now;
-                onEvent(new AgentEvent(AgentEventKind.ToolCallStarted, toolCall.Name, toolCall.Arguments));
+                onEvent(new AgentEvent(AgentEventKind.ToolCallStarted, ToolName: toolCall.Name, ToolArgs: toolCall.Arguments));
 
                 string result;
                 try
@@ -108,7 +108,7 @@ public class PeekabooAgentService : IAgentService
                 }
 
                 var duration = DateTime.Now - startTime;
-                onEvent(new AgentEvent(AgentEventKind.ToolCallCompleted, toolCall.Name, toolCall.Arguments, result, duration.ToString()));
+                onEvent(new AgentEvent(AgentEventKind.ToolCallCompleted, ToolName: toolCall.Name, ToolArgs: toolCall.Arguments, ToolResult: result, Duration: duration));
 
                 // Add tool result to conversation
                 conversation.Add(new ChatMessage(ChatRole.Assistant, $"[TOOL_RESULT:{toolCall.Name}]\n{result}"));
