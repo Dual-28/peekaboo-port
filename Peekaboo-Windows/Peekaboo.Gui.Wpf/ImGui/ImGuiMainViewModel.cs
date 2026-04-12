@@ -239,7 +239,7 @@ public class ImGuiMainViewModel
                 ImGui.SetCursorPos(new Vector2(15, 500));
                 ImGui.BeginChild("##sessions", new Vector2(_sidebarWidth - 20, 120), ImGuiChildFlags.Borders);
                 {
-                    foreach (var session in Sessions)
+                    foreach (var session in Snapshot(Sessions))
                     {
                         if (ImGui.Selectable(session.Title, false, ImGuiSelectableFlags.SpanAllColumns))
                         {
