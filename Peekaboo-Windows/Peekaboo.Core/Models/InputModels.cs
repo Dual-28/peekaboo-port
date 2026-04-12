@@ -59,6 +59,7 @@ public abstract record WindowTarget
     public sealed record ApplicationAndTitle(string AppName, string TitleText) : WindowTarget;
     public sealed record Frontmost : WindowTarget;
     public sealed record WindowId(int Id) : WindowTarget;
+    public sealed record All : WindowTarget;
 }
 
 /// <summary>

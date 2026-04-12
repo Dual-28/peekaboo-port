@@ -444,7 +444,10 @@ public static class Program
             var json = parseResult.GetValue(jsonOption);
             await using var sp = CreateServices(json);
             var winSvc = sp.GetRequiredService<IWindowManagementService>();
-            var windows = await winSvc.ListWindowsAsync(ParseWinTarget(parseResult));
+            var target = string.IsNullOrEmpty(parseResult.GetValue(winAppOpt)) && string.IsNullOrEmpty(parseResult.GetValue(winTitleOpt))
+                ? new WindowTarget.All()
+                : ParseWinTarget(parseResult);
+            var windows = await winSvc.ListWindowsAsync(target);
             if (json)
                 Console.WriteLine(JsonSerializer.Serialize(new { success = true, count = windows.Count, windows = windows.Select(w => new { w.Title, w.ProcessId, w.Bounds }) }, JsonOpts));
             else

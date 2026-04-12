@@ -669,7 +669,7 @@ AVAILABLE TOOLS:
     {
         WindowTarget target = args.TryGetProperty("app", out var a)
             ? new WindowTarget.Application(a.GetString()!)
-            : new WindowTarget.Frontmost();
+            : new WindowTarget.All();
         var windows = await _windows.ListWindowsAsync(target, ct);
         var sb = new StringBuilder($"Windows ({windows.Count}):\n");
         foreach (var w in windows)

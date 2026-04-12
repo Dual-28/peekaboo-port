@@ -84,9 +84,32 @@ public sealed class WindowsWindowManagementService : IWindowManagementService
             case WindowTarget.WindowId wid:
                 return new[] { await GetWindowInfoAsync((nint)wid.Id, 0, ct) };
 
+            case WindowTarget.All:
+                return await ListAllWindowsAsync(ct);
+
             default:
                 throw new NotImplementedException($"WindowTarget type {target.GetType().Name} not supported for listing");
         }
+    }
+
+    private async Task<IReadOnlyList<ServiceWindowInfo>> ListAllWindowsAsync(CancellationToken ct)
+    {
+        var windows = new List<ServiceWindowInfo>();
+        int index = 0;
+
+        NativeMethods.EnumWindowsProc proc = (hWnd, _) =>
+        {
+            if (ct.IsCancellationRequested) return false;
+            if (!NativeMethods.IsWindowVisible(hWnd)) return true;
+            if (NativeMethods.GetWindowTextLength(hWnd) <= 0) return true;
+
+            windows.Add(GetWindowInfoAsync(hWnd, index++, ct).GetAwaiter().GetResult());
+            return true;
+        };
+
+        NativeMethods.EnumWindows(proc, nint.Zero);
+        ct.ThrowIfCancellationRequested();
+        return await Task.FromResult<IReadOnlyList<ServiceWindowInfo>>(windows);
     }
 
     public async Task<ServiceWindowInfo?> GetFocusedWindowAsync(CancellationToken ct = default)

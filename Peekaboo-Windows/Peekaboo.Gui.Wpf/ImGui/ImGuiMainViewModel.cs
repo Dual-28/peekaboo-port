@@ -146,7 +146,7 @@ public class ImGuiMainViewModel
     {
         try
         {
-            var wins = await _windows.ListWindowsAsync(new WindowTarget.Frontmost());
+            var wins = await _windows.ListWindowsAsync(new WindowTarget.All());
             lock (_stateLock)
             {
                 OpenWindows.Clear();
@@ -647,6 +647,14 @@ public class ImGuiMainViewModel
             ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPos().X + 10, ImGui.GetCursorPos().Y));
             RenderText(tool.Arguments, new Vector4(0.5f, 0.5f, 0.5f, 1f));
         }
+
+        if (!string.IsNullOrEmpty(tool.Result))
+        {
+            ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPos().X + 10, ImGui.GetCursorPos().Y));
+            ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + Math.Max(120, ImGui.GetContentRegionAvail().X - 10));
+            RenderText(tool.Result, new Vector4(0.68f, 0.72f, 0.76f, 1f));
+            ImGui.PopTextWrapPos();
+        }
         
         ImGui.Separator();
     }
@@ -729,6 +737,10 @@ public class ImGuiMainViewModel
 
             case AgentEventKind.ToolCallCompleted:
                 CompleteLastToolEntry(evt);
+                if (!string.IsNullOrWhiteSpace(evt.ToolResult))
+                {
+                    AddChatMessage(new ChatMessageEntry("tool", evt.ToolResult, DateTimeOffset.Now));
+                }
                 break;
 
             case AgentEventKind.Error:
