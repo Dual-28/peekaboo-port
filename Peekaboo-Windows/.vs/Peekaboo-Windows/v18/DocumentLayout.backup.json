@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E93384AA-6976-4C6A-896E-8AA86460DFE3}|Peekaboo.Core\\Peekaboo.Core.csproj|c:\\users\\dualtach\\documents\\aasolitude\\peekaboo-main\\peekaboo-windows\\peekaboo.core\\peekaboo.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{E93384AA-6976-4C6A-896E-8AA86460DFE3}|Peekaboo.Core\\Peekaboo.Core.csproj|solutionrelative:peekaboo.core\\peekaboo.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{EB9E402A-3830-4636-AE00-531C707B3F4D}|Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj|c:\\users\\dualtach\\documents\\aasolitude\\peekaboo-main\\peekaboo-windows\\peekaboo.platform.windows\\peekaboo.platform.windows.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{EB9E402A-3830-4636-AE00-531C707B3F4D}|Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj|solutionrelative:peekaboo.platform.windows\\peekaboo.platform.windows.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E93384AA-6976-4C6A-896E-8AA86460DFE3}|Peekaboo.Core\\Peekaboo.Core.csproj|c:\\users\\dualtach\\documents\\aasolitude\\peekaboo-main\\peekaboo-windows\\peekaboo.core\\peekaboo.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{E93384AA-6976-4C6A-896E-8AA86460DFE3}|Peekaboo.Core\\Peekaboo.Core.csproj|solutionrelative:peekaboo.core\\peekaboo.core.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,38 +18,30 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{c6f34f0d-7ae5-4f3a-be61-fe0c21ae9eb8}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
-            {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Peekaboo.Platform.Windows",
+              "DocumentIndex": 0,
+              "Title": "Peekaboo.Platform.Windows.csproj",
               "DocumentMoniker": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
               "RelativeDocumentMoniker": "Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
               "ToolTip": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
               "RelativeToolTip": "Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAOAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
               "WhenOpened": "2026-04-11T00:54:45.137Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Peekaboo.Core",
+              "DocumentIndex": 1,
+              "Title": "Peekaboo.Core.csproj",
               "DocumentMoniker": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj",
               "RelativeDocumentMoniker": "Peekaboo.Core\\Peekaboo.Core.csproj",
               "ToolTip": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj",
               "RelativeToolTip": "Peekaboo.Core\\Peekaboo.Core.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
               "WhenOpened": "2026-04-11T00:52:59.234Z",
               "EditorCaption": ""
