@@ -35,6 +35,7 @@ public class ImGuiMainViewModel
     private readonly IWindowManagementService _windows;
     private readonly IPermissionsService _permissions;
     private readonly AiSettings _settings;
+    private readonly object _stateLock = new();
     private CancellationTokenSource? _taskCts;
 
     private int _currentTab;
@@ -102,22 +103,28 @@ public class ImGuiMainViewModel
     private void NewSession()
     {
         var session = _sessionStore.CreateSession(modelName: _settings.SelectedModel);
-        Sessions.Insert(0, _sessionStore.GetSummaries().First(s => s.Id == session.Id));
-        ChatMessages.Clear();
-        ToolHistory.Clear();
+        lock (_stateLock)
+        {
+            Sessions.Insert(0, _sessionStore.GetSummaries().First(s => s.Id == session.Id));
+            ChatMessages.Clear();
+            ToolHistory.Clear();
+        }
     }
 
     private void LoadCurrentSessionMessages()
     {
-        ChatMessages.Clear();
-        if (_sessionStore.CurrentSession == null) return;
-
-        foreach (var msg in _sessionStore.CurrentSession.Messages)
+        lock (_stateLock)
         {
-            ChatMessages.Add(new ChatMessageEntry(
-                msg.Role, msg.Content, msg.Timestamp,
-                msg.ToolCalls?.Select(tc => new ToolExecutionEntry(
-                    tc.Name, tc.Arguments, tc.Result, false, tc.Status == "completed", null)).ToList()));
+            ChatMessages.Clear();
+            if (_sessionStore.CurrentSession == null) return;
+
+            foreach (var msg in _sessionStore.CurrentSession.Messages)
+            {
+                ChatMessages.Add(new ChatMessageEntry(
+                    msg.Role, msg.Content, msg.Timestamp,
+                    msg.ToolCalls?.Select(tc => new ToolExecutionEntry(
+                        tc.Name, tc.Arguments, tc.Result, false, tc.Status == "completed", null)).ToList()));
+            }
         }
     }
 
@@ -126,8 +133,11 @@ public class ImGuiMainViewModel
         try
         {
             var apps = await _apps.ListApplicationsAsync();
-            RunningApps.Clear();
-            foreach (var a in apps) RunningApps.Add(a);
+            lock (_stateLock)
+            {
+                RunningApps.Clear();
+                foreach (var a in apps) RunningApps.Add(a);
+            }
         }
         catch { }
     }
@@ -136,9 +146,12 @@ public class ImGuiMainViewModel
     {
         try
         {
-            var wins = await _windows.ListWindowsAsync(new WindowTarget.Frontmost());
-            OpenWindows.Clear();
-            foreach (var w in wins) OpenWindows.Add(w);
+            var wins = await _windows.ListWindowsAsync(new WindowTarget.All());
+            lock (_stateLock)
+            {
+                OpenWindows.Clear();
+                foreach (var w in wins) OpenWindows.Add(w);
+            }
         }
         catch { }
     }
@@ -420,7 +433,7 @@ public class ImGuiMainViewModel
         float chatHeight = mainHeight - 180;
         ImGui.BeginChild("##chat", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, chatHeight)), ImGuiChildFlags.Borders);
         {
-            foreach (var msg in ChatMessages)
+            foreach (var msg in Snapshot(ChatMessages))
             {
                 RenderChatMessage(msg);
             }
@@ -461,7 +474,7 @@ public class ImGuiMainViewModel
         ImGui.SetCursorPos(new Vector2(20, 120));
         ImGui.BeginChild("##apps", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, mainHeight - 140)), ImGuiChildFlags.Borders);
         {
-            foreach (var app in RunningApps)
+            foreach (var app in Snapshot(RunningApps))
             {
                 var active = app.IsActive ? " *" : "";
                 if (ImGui.Selectable($"{app.Name}{active}  pid:{app.ProcessId}  windows:{app.WindowCount}"))
@@ -484,7 +497,7 @@ public class ImGuiMainViewModel
         ImGui.SetCursorPos(new Vector2(20, 120));
         ImGui.BeginChild("##windows", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, mainHeight - 140)), ImGuiChildFlags.Borders);
         {
-            foreach (var window in OpenWindows)
+            foreach (var window in Snapshot(OpenWindows))
             {
                 var appName = window.ProcessName ?? "unknown";
                 var marker = window.IsMainWindow ? " *" : "";
@@ -502,7 +515,7 @@ public class ImGuiMainViewModel
         ImGui.SetCursorPos(new Vector2(20, 80));
         ImGui.BeginChild("##historytab", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, mainHeight - 100)), ImGuiChildFlags.Borders);
         {
-            foreach (var tool in ToolHistory)
+            foreach (var tool in Snapshot(ToolHistory))
             {
                 RenderToolEntry(tool);
             }
@@ -522,6 +535,14 @@ public class ImGuiMainViewModel
             ImGui.TextWrapped("Edit provider settings from the WPF settings window for now.");
         }
         ImGui.EndChild();
+    }
+
+    private List<T> Snapshot<T>(IEnumerable<T> items)
+    {
+        lock (_stateLock)
+        {
+            return items.ToList();
+        }
     }
 
     private void RenderChatMessage(ChatMessageEntry msg)
@@ -548,26 +569,26 @@ public class ImGuiMainViewModel
                 break;
         }
         
-        var drawList = ImGui.GetWindowDrawList();
-        
         bool isUser = msg.Role == "user";
-        float maxWidth = 600;
-        
-        var cursorPos = ImGui.GetCursorPos();
-        float startX = isUser ? ImGui.GetWindowWidth() - maxWidth - 20 : 20;
-        
-        drawList.AddRectFilled(
-            new Vector2(startX, cursorPos.Y),
-            new Vector2(startX + maxWidth, cursorPos.Y + 60),
-            ImGui.GetColorU32(bgColor),
-            4);
-        
-        ImGui.SetCursorPos(new Vector2(startX + 10, cursorPos.Y + 8));
-        ImGui.PushTextWrapPos(startX + maxWidth - 20);
-        ImGui.TextColored(textColor, msg.Content);
-        ImGui.PopTextWrapPos();
-        
-        ImGui.SetCursorPos(new Vector2(startX, cursorPos.Y + 65));
+        float maxWidth = Math.Min(600, Math.Max(160, ImGui.GetWindowWidth() - 40));
+        float startX = isUser ? Math.Max(20, ImGui.GetWindowWidth() - maxWidth - 20) : 20;
+        int estimatedLines = Math.Max(1, (msg.Content?.Length ?? 0) / 72 + 1);
+        float height = Math.Max(44, estimatedLines * ImGui.GetTextLineHeightWithSpacing() + 20);
+
+        ImGui.SetCursorPosX(startX);
+        ImGui.PushID($"{msg.Role}-{msg.Timestamp.ToUnixTimeMilliseconds()}-{(msg.Content?.GetHashCode() ?? 0)}");
+        ImGui.PushStyleColor(ImGuiCol.ChildBg, bgColor);
+        ImGui.PushStyleColor(ImGuiCol.Text, textColor);
+        ImGui.BeginChild("##message", new Vector2(maxWidth, height), ImGuiChildFlags.None);
+        {
+            ImGui.SetCursorPos(new Vector2(10, 8));
+            ImGui.PushTextWrapPos(maxWidth - 20);
+            ImGui.TextUnformatted(msg.Content);
+            ImGui.PopTextWrapPos();
+        }
+        ImGui.EndChild();
+        ImGui.PopStyleColor(2);
+        ImGui.PopID();
     }
 
     private void RenderToolHistoryPanel(float x, float y, float width, int height)
@@ -597,7 +618,7 @@ public class ImGuiMainViewModel
             ImGui.SetCursorPos(new Vector2(10, 60));
             ImGui.BeginChild("##toollist", new Vector2(width - 20, height - 70), ImGuiChildFlags.Borders);
             {
-                foreach (var tool in ToolHistory)
+                foreach (var tool in Snapshot(ToolHistory))
                 {
                     RenderToolEntry(tool);
                 }
@@ -617,17 +638,32 @@ public class ImGuiMainViewModel
         
         string statusIcon = tool.IsRunning ? "..." : (tool.IsSuccess ? "OK" : "X");
         
-        ImGui.TextColored(statusColor, statusIcon);
+        RenderText(statusIcon, statusColor);
         ImGui.SameLine();
-        ImGui.Text(tool.ToolName);
+        ImGui.TextUnformatted(tool.ToolName);
         
         if (!string.IsNullOrEmpty(tool.Arguments))
         {
             ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPos().X + 10, ImGui.GetCursorPos().Y));
-            ImGui.TextColored(new Vector4(0.5f, 0.5f, 0.5f, 1f), tool.Arguments);
+            RenderText(tool.Arguments, new Vector4(0.5f, 0.5f, 0.5f, 1f));
+        }
+
+        if (!string.IsNullOrEmpty(tool.Result))
+        {
+            ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPos().X + 10, ImGui.GetCursorPos().Y));
+            ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + Math.Max(120, ImGui.GetContentRegionAvail().X - 10));
+            RenderText(tool.Result, new Vector4(0.68f, 0.72f, 0.76f, 1f));
+            ImGui.PopTextWrapPos();
         }
         
         ImGui.Separator();
+    }
+
+    private static void RenderText(string text, Vector4 color)
+    {
+        ImGui.PushStyleColor(ImGuiCol.Text, color);
+        ImGui.TextUnformatted(text);
+        ImGui.PopStyleColor();
     }
 
     private void SendMessage()
@@ -637,7 +673,7 @@ public class ImGuiMainViewModel
         var text = _userInput.Trim();
         _userInput = "";
 
-        ChatMessages.Add(new ChatMessageEntry("user", text, DateTimeOffset.Now));
+        AddChatMessage(new ChatMessageEntry("user", text, DateTimeOffset.Now));
         _sessionStore.AddMessage(new ConversationMessage("user", text));
 
         if (_sessionStore.CurrentSession?.Title == "New Session")
@@ -649,7 +685,7 @@ public class ImGuiMainViewModel
         _taskCts = new CancellationTokenSource();
         _isProcessing = true;
 
-        ChatMessages.Add(new ChatMessageEntry("system", "Thinking...", DateTimeOffset.Now));
+        AddChatMessage(new ChatMessageEntry("system", "Thinking...", DateTimeOffset.Now));
 
         _ = ExecuteTaskAsync(text, _taskCts.Token);
     }
@@ -661,23 +697,20 @@ public class ImGuiMainViewModel
             var history = _sessionStore.CurrentSession?.Messages ?? new List<ConversationMessage>();
             var result = await _agent.ExecuteTaskAsync(task, history, OnAgentEvent, ct);
 
-            var thinkingIdx = ChatMessages.ToList().FindIndex(m => m.Role == "system" && m.Content == "Thinking...");
-            if (thinkingIdx >= 0) ChatMessages.RemoveAt(thinkingIdx);
+            RemoveThinkingMessage();
 
-            ChatMessages.Add(new ChatMessageEntry("assistant", result, DateTimeOffset.Now));
+            AddChatMessage(new ChatMessageEntry("assistant", result, DateTimeOffset.Now));
             _sessionStore.AddMessage(new ConversationMessage("assistant", result));
         }
         catch (OperationCanceledException)
         {
-            var thinkingIdx = ChatMessages.ToList().FindIndex(m => m.Role == "system" && m.Content == "Thinking...");
-            if (thinkingIdx >= 0) ChatMessages.RemoveAt(thinkingIdx);
-            ChatMessages.Add(new ChatMessageEntry("system", "Task was cancelled.", DateTimeOffset.Now));
+            RemoveThinkingMessage();
+            AddChatMessage(new ChatMessageEntry("system", "Task was cancelled.", DateTimeOffset.Now));
         }
         catch (Exception ex)
         {
-            var thinkingIdx = ChatMessages.ToList().FindIndex(m => m.Role == "system" && m.Content == "Thinking...");
-            if (thinkingIdx >= 0) ChatMessages.RemoveAt(thinkingIdx);
-            ChatMessages.Add(new ChatMessageEntry("system", $"Error: {ex.Message}", DateTimeOffset.Now));
+            RemoveThinkingMessage();
+            AddChatMessage(new ChatMessageEntry("system", $"Error: {ex.Message}", DateTimeOffset.Now));
         }
         finally
         {
@@ -695,31 +728,67 @@ public class ImGuiMainViewModel
                 break;
 
             case AgentEventKind.ToolCallStarted:
-                ToolHistory.Add(new ToolExecutionEntry(
+                AddToolEntry(new ToolExecutionEntry(
                     evt.ToolName ?? "unknown", evt.ToolArgs, null, true, false, null));
-                ChatMessages.Add(new ChatMessageEntry("tool",
+                AddChatMessage(new ChatMessageEntry("tool",
                     $"{evt.ToolName}: {evt.ToolArgs}",
                     DateTimeOffset.Now));
                 break;
 
             case AgentEventKind.ToolCallCompleted:
-                if (ToolHistory.Count > 0)
+                CompleteLastToolEntry(evt);
+                if (!string.IsNullOrWhiteSpace(evt.ToolResult))
                 {
-                    var last = ToolHistory[^1];
-                    var idx = ToolHistory.IndexOf(last);
-                    ToolHistory[idx] = last with
-                    {
-                        IsRunning = false,
-                        IsSuccess = !string.IsNullOrEmpty(evt.ToolResult) && !evt.ToolResult.StartsWith("Error:"),
-                        Result = evt.ToolResult,
-                        Duration = evt.Duration,
-                    };
+                    AddChatMessage(new ChatMessageEntry("tool", evt.ToolResult, DateTimeOffset.Now));
                 }
                 break;
 
             case AgentEventKind.Error:
-                ChatMessages.Add(new ChatMessageEntry("system", $"Error: {evt.Content}", DateTimeOffset.Now));
+                AddChatMessage(new ChatMessageEntry("system", $"Error: {evt.Content}", DateTimeOffset.Now));
                 break;
+        }
+    }
+
+    private void AddChatMessage(ChatMessageEntry message)
+    {
+        lock (_stateLock)
+        {
+            ChatMessages.Add(message);
+        }
+    }
+
+    private void AddToolEntry(ToolExecutionEntry tool)
+    {
+        lock (_stateLock)
+        {
+            ToolHistory.Add(tool);
+        }
+    }
+
+    private void RemoveThinkingMessage()
+    {
+        lock (_stateLock)
+        {
+            var thinkingIdx = ChatMessages.ToList().FindIndex(m => m.Role == "system" && m.Content == "Thinking...");
+            if (thinkingIdx >= 0) ChatMessages.RemoveAt(thinkingIdx);
+        }
+    }
+
+    private void CompleteLastToolEntry(AgentEvent evt)
+    {
+        lock (_stateLock)
+        {
+            if (ToolHistory.Count == 0) return;
+
+            var last = ToolHistory[^1];
+            var idx = ToolHistory.IndexOf(last);
+            ToolHistory[idx] = last with
+            {
+                IsRunning = false,
+                IsSuccess = !string.IsNullOrEmpty(evt.ToolResult) && !evt.ToolResult.StartsWith("Error:"),
+                Result = evt.ToolResult,
+                Duration = evt.Duration,
+            };
         }
     }
 
