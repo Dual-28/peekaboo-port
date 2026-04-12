@@ -336,6 +336,7 @@
                                         </StackPanel>
                                         <TextBlock Text="{Binding Arguments}" FontSize="10" Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" TextWrapping="Wrap"/>
                                         <TextBlock Text="{Binding Duration, StringFormat={}{0:F1}s}" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,2,0,0" Visibility="{Binding Duration, Converter={StaticResource NullToVisibility}}"/>
+                                        <TextBlock Text="{Binding ToolResult}" FontSize="10" Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" TextWrapping="Wrap" Visibility="{Binding ToolResult, Converter={StaticResource NullToVisibility}}"/>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>

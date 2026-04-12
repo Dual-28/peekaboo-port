@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Peekaboo.Gui.Wpf")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9ceb353b9e331620964850aa8ff2c74baaed118a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+62940258a01c9c3df8ccf2bdbe58449c81dbfcf7")]
 [assembly: System.Reflection.AssemblyProductAttribute("Peekaboo.Gui.Wpf")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Peekaboo.Gui.Wpf")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

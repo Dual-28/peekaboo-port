@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Peekaboo.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9ceb353b9e331620964850aa8ff2c74baaed118a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a046512d97a4eba6d622b13886b301f0bc10a97a")]
 [assembly: System.Reflection.AssemblyProductAttribute("Peekaboo.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Peekaboo.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

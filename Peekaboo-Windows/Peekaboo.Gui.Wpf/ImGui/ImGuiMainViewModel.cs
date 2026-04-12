@@ -239,7 +239,7 @@ public class ImGuiMainViewModel
                 ImGui.SetCursorPos(new Vector2(15, 500));
                 ImGui.BeginChild("##sessions", new Vector2(_sidebarWidth - 20, 120), ImGuiChildFlags.Borders);
                 {
-                    foreach (var session in Sessions)
+                    foreach (var session in Snapshot(Sessions))
                     {
                         if (ImGui.Selectable(session.Title, false, ImGuiSelectableFlags.SpanAllColumns))
                         {
@@ -371,7 +371,7 @@ public class ImGuiMainViewModel
                 ImGui.GetColorU32(new Vector4(0.137f, 0.141f, 0.161f, 1f)));
             
             ImGui.SetCursorPos(new Vector2(20, 20));
-            ImGui.Text(GetCurrentTabTitle());
+            ImGui.TextUnformatted(GetCurrentTabTitle());
             
             ImGui.SameLine(mainWidth - 150);
             ImGui.SetCursorPos(new Vector2(mainWidth - 130, 20));
@@ -528,9 +528,9 @@ public class ImGuiMainViewModel
         ImGui.SetCursorPos(new Vector2(20, 80));
         ImGui.BeginChild("##settingstab", new Vector2(Math.Max(1, mainWidth - 40), Math.Max(1, mainHeight - 100)), ImGuiChildFlags.Borders);
         {
-            ImGui.Text($"Provider: {_settings.SelectedProvider}");
-            ImGui.Text($"Model: {_settings.SelectedModel}");
-            ImGui.Text(PermissionStatus);
+            ImGui.TextUnformatted($"Provider: {_settings.SelectedProvider}");
+            ImGui.TextUnformatted($"Model: {_settings.SelectedModel}");
+            ImGui.TextUnformatted(PermissionStatus);
             ImGui.Separator();
             ImGui.TextWrapped("Edit provider settings from the WPF settings window for now.");
         }

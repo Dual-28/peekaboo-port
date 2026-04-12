@@ -679,6 +679,378 @@ public static class Program
         });
 
         // ═══════════════════════════════════════════
+        // MENU COMMANDS
+        // ═══════════════════════════════════════════
+        var menuListCmd = new Command("list", "List menu items");
+        var menuAppOpt = new Option<string?>("--app") { Description = "Application name (default: frontmost)" };
+        var menuSysOpt = new Option<bool>("--system") { Description = "Use system menu instead of app menu" };
+        menuListCmd.Options.Add(menuAppOpt);
+        menuListCmd.Options.Add(menuSysOpt);
+        menuListCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var app = parseResult.GetValue(menuAppOpt);
+            var useSys = parseResult.GetValue(menuSysOpt);
+            await using var sp = CreateServices(json);
+            var menuSvc = sp.GetRequiredService<IMenuDiscoveryService>();
+            var target = new MenuTarget(app, useSys);
+            var items = await menuSvc.ListMenuItemsAsync(target);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, count = items.Count, items = items.Select(i => new { i.Id, i.Label, i.Shortcut, i.IsEnabled, i.IsChecked, i.HasSubmenu, i.Position }) }, JsonOpts));
+            else
+            {
+                Console.WriteLine($"Menu items ({items.Count}):");
+                foreach (var i in items)
+                    Console.WriteLine($"  [{i.Position}] {i.Label}" + (i.HasSubmenu ? " >" : "") + (i.IsEnabled ? "" : " (disabled)"));
+            }
+        });
+
+        var menuClickCmd = new Command("click", "Click a menu item");
+        var menuClickAppOpt = new Option<string?>("--app") { Description = "Application name" };
+        var menuClickSysOpt = new Option<bool>("--system") { Description = "Use system menu" };
+        var menuClickPathArg = new Argument<string>("path") { Description = "Menu path (e.g., File > Save As)" };
+        menuClickCmd.Options.Add(menuClickAppOpt);
+        menuClickCmd.Options.Add(menuClickSysOpt);
+        menuClickCmd.Arguments.Add(menuClickPathArg);
+        menuClickCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var app = parseResult.GetValue(menuClickAppOpt);
+            var useSys = parseResult.GetValue(menuClickSysOpt);
+            var path = parseResult.GetValue(menuClickPathArg);
+            if (string.IsNullOrEmpty(path))
+            {
+                Console.Error.WriteLine("Error: menu path is required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var menuSvc = sp.GetRequiredService<IMenuDiscoveryService>();
+            var target = new MenuTarget(app, useSys);
+            await menuSvc.ClickMenuItemAsync(target, path!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "click", path }, JsonOpts));
+            else
+                Console.WriteLine($"Clicked menu: {path}");
+            return 0;
+        });
+
+        var menuHasCmd = new Command("has", "Check if app has menu bar");
+        var menuHasAppArg = new Argument<string>("app") { Description = "Application name" };
+        menuHasCmd.Arguments.Add(menuHasAppArg);
+        menuHasCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var app = parseResult.GetValue(menuHasAppArg);
+            if (string.IsNullOrEmpty(app))
+            {
+                Console.Error.WriteLine("Error: app argument is required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var menuSvc = sp.GetRequiredService<IMenuDiscoveryService>();
+            var has = await menuSvc.HasMenuBarAsync(app!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, app, hasMenuBar = has }, JsonOpts));
+            else
+                Console.WriteLine(has ? $"{app} has a menu bar" : $"{app} has no menu bar");
+            return 0;
+        });
+
+        var menuCmd = new Command("menu", "Discover and interact with menu bars");
+        menuCmd.Subcommands.Add(menuListCmd);
+        menuCmd.Subcommands.Add(menuClickCmd);
+        menuCmd.Subcommands.Add(menuHasCmd);
+
+        // ═══════════════════════════════════════════
+        // TASKBAR COMMANDS
+        // ═══════════════════════════════════════════
+        var taskbarListCmd = new Command("list", "List taskbar items");
+        taskbarListCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            await using var sp = CreateServices(json);
+            var taskbarSvc = sp.GetRequiredService<ITaskbarService>();
+            var items = await taskbarSvc.ListTaskbarItemsAsync();
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, count = items.Count, items = items.Select(i => new { i.Id, i.Name, i.ProcessName, i.ProcessId, i.IsActive, i.IsPinned }) }, JsonOpts));
+            else
+            {
+                Console.WriteLine($"Taskbar items ({items.Count}):");
+                foreach (var i in items)
+                    Console.WriteLine($"  [{i.Id}] {i.Name} (PID {i.ProcessId})" + (i.IsPinned ? " pinned" : "") + (i.IsActive ? " active" : ""));
+            }
+        });
+
+        var taskbarClickCmd = new Command("click", "Click a taskbar item");
+        var taskbarClickIdArg = new Argument<string>("id") { Description = "Taskbar item ID or name" };
+        taskbarClickCmd.Arguments.Add(taskbarClickIdArg);
+        taskbarClickCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var id = parseResult.GetValue(taskbarClickIdArg);
+            if (string.IsNullOrEmpty(id))
+            {
+                Console.Error.WriteLine("Error: item id/name is required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var taskbarSvc = sp.GetRequiredService<ITaskbarService>();
+            await taskbarSvc.ClickTaskbarItemAsync(id!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "click", itemId = id }, JsonOpts));
+            else
+                Console.WriteLine($"Clicked taskbar item: {id}");
+            return 0;
+        });
+
+        var taskbarHideCmd = new Command("hide", "Hide a taskbar item");
+        var taskbarHideArg = new Argument<string>("id") { Description = "Taskbar item ID" };
+        taskbarHideCmd.Arguments.Add(taskbarHideArg);
+        taskbarHideCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var id = parseResult.GetValue(taskbarHideArg);
+            if (string.IsNullOrEmpty(id))
+            {
+                Console.Error.WriteLine("Error: item id is required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var taskbarSvc = sp.GetRequiredService<ITaskbarService>();
+            await taskbarSvc.HideTaskbarItemAsync(id!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "hide", itemId = id }, JsonOpts));
+            else
+                Console.WriteLine($"Hidden taskbar item: {id}");
+            return 0;
+        });
+
+        var taskbarShowCmd = new Command("show", "Show a hidden taskbar item");
+        var taskbarShowArg = new Argument<string>("id") { Description = "Taskbar item ID" };
+        taskbarShowCmd.Arguments.Add(taskbarShowArg);
+        taskbarShowCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var id = parseResult.GetValue(taskbarShowArg);
+            if (string.IsNullOrEmpty(id))
+            {
+                Console.Error.WriteLine("Error: item id is required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var taskbarSvc = sp.GetRequiredService<ITaskbarService>();
+            await taskbarSvc.ShowTaskbarItemAsync(id!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "show", itemId = id }, JsonOpts));
+            else
+                Console.WriteLine($"Showed taskbar item: {id}");
+            return 0;
+        });
+
+        var taskbarCmd = new Command("taskbar", "Interact with Windows taskbar");
+        taskbarCmd.Subcommands.Add(taskbarListCmd);
+        taskbarCmd.Subcommands.Add(taskbarClickCmd);
+        taskbarCmd.Subcommands.Add(taskbarHideCmd);
+        taskbarCmd.Subcommands.Add(taskbarShowCmd);
+
+        // ═══════════════════════════════════════════
+        // DIALOG COMMANDS
+        // ═══════════════════════════════════════════
+        var dialogWaitCmd = new Command("wait", "Wait for a dialog to appear");
+        var dialogTimeoutOpt = new Option<int>("--timeout") { Description = "Timeout in ms", DefaultValueFactory = _ => 5000 };
+        dialogWaitCmd.Options.Add(dialogTimeoutOpt);
+        dialogWaitCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var timeout = parseResult.GetValue(dialogTimeoutOpt);
+            await using var sp = CreateServices(json);
+            var dialogSvc = sp.GetRequiredService<IDialogService>();
+            var found = await dialogSvc.WaitForDialogAsync(timeout);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "wait", dialogFound = found, timeoutMs = timeout }, JsonOpts));
+            else
+                Console.WriteLine(found ? "Dialog appeared" : "No dialog within timeout");
+            return found ? 0 : 1;
+        });
+
+        var dialogSetPathCmd = new Command("set-path", "Set file path in dialog");
+        var dialogPathArg = new Argument<string>("path") { Description = "File path" };
+        dialogSetPathCmd.Arguments.Add(dialogPathArg);
+        dialogSetPathCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var path = parseResult.GetValue(dialogPathArg);
+            if (string.IsNullOrEmpty(path))
+            {
+                Console.Error.WriteLine("Error: path is required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var dialogSvc = sp.GetRequiredService<IDialogService>();
+            await dialogSvc.SetPathAsync(path!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "set-path", path }, JsonOpts));
+            else
+                Console.WriteLine($"Set dialog path: {path}");
+            return 0;
+        });
+
+        var dialogSetFilterCmd = new Command("set-filter", "Set file type filter");
+        var dialogFilterArg = new Argument<string>("filter") { Description = "Filter string (e.g., Text Files|*.txt|All Files|*.*)" };
+        dialogSetFilterCmd.Arguments.Add(dialogFilterArg);
+        dialogSetFilterCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var filter = parseResult.GetValue(dialogFilterArg);
+            if (string.IsNullOrEmpty(filter))
+            {
+                Console.Error.WriteLine("Error: filter is required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var dialogSvc = sp.GetRequiredService<IDialogService>();
+            await dialogSvc.SetFilterAsync(filter!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "set-filter", filter }, JsonOpts));
+            else
+                Console.WriteLine($"Set dialog filter: {filter}");
+            return 0;
+        });
+
+        var dialogClickCmd = new Command("click", "Click dialog button");
+        var dialogButtonOpt = new Option<DialogButton>("--button") { Description = "Button to click" };
+        dialogClickCmd.Options.Add(dialogButtonOpt);
+        dialogClickCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var button = parseResult.GetValue(dialogButtonOpt);
+            await using var sp = CreateServices(json);
+            var dialogSvc = sp.GetRequiredService<IDialogService>();
+            await dialogSvc.ClickButtonAsync(button);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "click", button = button.ToString() }, JsonOpts));
+            else
+                Console.WriteLine($"Clicked dialog button: {button}");
+            return 0;
+        });
+
+        var dialogCmd = new Command("dialog", "Drive file open/save dialogs");
+        dialogCmd.Subcommands.Add(dialogWaitCmd);
+        dialogCmd.Subcommands.Add(dialogSetPathCmd);
+        dialogCmd.Subcommands.Add(dialogSetFilterCmd);
+        dialogCmd.Subcommands.Add(dialogClickCmd);
+
+        // ═══════════════════════════════════════════
+        // SPACE (VIRTUAL DESKTOP) COMMANDS
+        // ═══════════════════════════════════════════
+        var spaceListCmd = new Command("list", "List virtual desktops");
+        spaceListCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            await using var sp = CreateServices(json);
+            var spaceSvc = sp.GetRequiredService<IVirtualDesktopService>();
+            var desktops = await spaceSvc.ListDesktopsAsync();
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, count = desktops.Count, desktops = desktops.Select(d => new { d.Id, d.Name, d.Index, d.IsCurrent }) }, JsonOpts));
+            else
+            {
+                Console.WriteLine($"Virtual desktops ({desktops.Count}):");
+                foreach (var d in desktops)
+                    Console.WriteLine($"  [{d.Index}] {d.Name}" + (d.IsCurrent ? " (current)" : ""));
+            }
+        });
+
+        var spaceSwitchCmd = new Command("switch", "Switch to a virtual desktop");
+        var spaceSwitchArg = new Argument<string>("id") { Description = "Desktop ID" };
+        spaceSwitchCmd.Arguments.Add(spaceSwitchArg);
+        spaceSwitchCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var id = parseResult.GetValue(spaceSwitchArg);
+            if (string.IsNullOrEmpty(id))
+            {
+                Console.Error.WriteLine("Error: desktop id is required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var spaceSvc = sp.GetRequiredService<IVirtualDesktopService>();
+            await spaceSvc.SwitchToDesktopAsync(id!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "switch", desktopId = id }, JsonOpts));
+            else
+                Console.WriteLine($"Switched to desktop: {id}");
+            return 0;
+        });
+
+        var spaceCreateCmd = new Command("create", "Create a new virtual desktop");
+        spaceCreateCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            await using var sp = CreateServices(json);
+            var spaceSvc = sp.GetRequiredService<IVirtualDesktopService>();
+            var id = await spaceSvc.CreateDesktopAsync();
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "create", desktopId = id }, JsonOpts));
+            else
+                Console.WriteLine($"Created desktop: {id}");
+            return 0;
+        });
+
+        var spaceDeleteCmd = new Command("delete", "Delete a virtual desktop");
+        var spaceDeleteArg = new Argument<string>("id") { Description = "Desktop ID" };
+        spaceDeleteCmd.Arguments.Add(spaceDeleteArg);
+        spaceDeleteCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var id = parseResult.GetValue(spaceDeleteArg);
+            if (string.IsNullOrEmpty(id))
+            {
+                Console.Error.WriteLine("Error: desktop id is required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var spaceSvc = sp.GetRequiredService<IVirtualDesktopService>();
+            await spaceSvc.DeleteDesktopAsync(id!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "delete", desktopId = id }, JsonOpts));
+            else
+                Console.WriteLine($"Deleted desktop: {id}");
+            return 0;
+        });
+
+        var spaceMoveCmd = new Command("move", "Move window to a virtual desktop");
+        var spaceMoveWindowArg = new Argument<string>("window") { Description = "Window title" };
+        var spaceMoveDesktopArg = new Argument<string>("desktop") { Description = "Desktop ID" };
+        spaceMoveCmd.Arguments.Add(spaceMoveWindowArg);
+        spaceMoveCmd.Arguments.Add(spaceMoveDesktopArg);
+        spaceMoveCmd.SetAction(async parseResult =>
+        {
+            var json = parseResult.GetValue(jsonOption);
+            var window = parseResult.GetValue(spaceMoveWindowArg);
+            var desktop = parseResult.GetValue(spaceMoveDesktopArg);
+            if (string.IsNullOrEmpty(window) || string.IsNullOrEmpty(desktop))
+            {
+                Console.Error.WriteLine("Error: window and desktop arguments are required");
+                return 1;
+            }
+            await using var sp = CreateServices(json);
+            var spaceSvc = sp.GetRequiredService<IVirtualDesktopService>();
+            await spaceSvc.MoveWindowToDesktopAsync(window!, desktop!);
+            if (json)
+                Console.WriteLine(JsonSerializer.Serialize(new { success = true, action = "move", window, desktopId = desktop }, JsonOpts));
+            else
+                Console.WriteLine($"Moved window '{window}' to desktop: {desktop}");
+            return 0;
+        });
+
+        var spaceCmd = new Command("space", "Manage virtual desktops (Windows Spaces)");
+        spaceCmd.Subcommands.Add(spaceListCmd);
+        spaceCmd.Subcommands.Add(spaceSwitchCmd);
+        spaceCmd.Subcommands.Add(spaceCreateCmd);
+        spaceCmd.Subcommands.Add(spaceDeleteCmd);
+        spaceCmd.Subcommands.Add(spaceMoveCmd);
+
+        // ═══════════════════════════════════════════
         // ROOT COMMAND
         // ═══════════════════════════════════════════
         var rootCommand = new RootCommand("Peekaboo for Windows - desktop automation CLI");
@@ -695,6 +1067,10 @@ public static class Program
         rootCommand.Subcommands.Add(clipCmd);
         rootCommand.Subcommands.Add(permCmd);
         rootCommand.Subcommands.Add(cleanCmd);
+        rootCommand.Subcommands.Add(menuCmd);
+        rootCommand.Subcommands.Add(taskbarCmd);
+        rootCommand.Subcommands.Add(dialogCmd);
+        rootCommand.Subcommands.Add(spaceCmd);
 
         // Default action when invoked without arguments
         rootCommand.SetAction(parseResult =>
@@ -714,6 +1090,10 @@ public static class Program
             Console.WriteLine("  clipboard  - Manage clipboard");
             Console.WriteLine("  permissions - Check automation permissions");
             Console.WriteLine("  clean      - Clean up snapshots");
+            Console.WriteLine("  menu       - Discover and interact with menu bars");
+            Console.WriteLine("  taskbar    - Interact with Windows taskbar");
+            Console.WriteLine("  dialog     - Drive file open/save dialogs");
+            Console.WriteLine("  space      - Manage virtual desktops (Windows Spaces)");
             Console.WriteLine();
             Console.WriteLine("Use --help with any command for more details.");
             return 0;
@@ -737,6 +1117,10 @@ public static class Program
             .AddSingleton<IWindowManagementService, WindowsWindowManagementService>()
             .AddSingleton<IClipboardService, WindowsClipboardService>()
             .AddSingleton<IPermissionsService, WindowsPermissionsService>()
+            .AddSingleton<IMenuDiscoveryService, WindowsMenuDiscoveryService>()
+            .AddSingleton<ITaskbarService, WindowsTaskbarService>()
+            .AddSingleton<IDialogService, WindowsDialogService>()
+            .AddSingleton<IVirtualDesktopService, WindowsVirtualDesktopService>()
             .BuildServiceProvider();
     }
 }

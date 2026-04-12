@@ -36,22 +36,19 @@ public sealed class WindowsMenuDiscoveryService : IMenuDiscoveryService
                 return Task.FromResult<IReadOnlyList<MenuItemInfo>>(items);
             }
 
-            var hMenu = Win32.GetMenu(hwnd);
-            if (hMenu == 0)
+            // Use system menu if requested
+            IntPtr hMenu = target.UseSystemMenu 
+                ? Win32.GetSystemMenu(hwnd, false) 
+                : Win32.GetMenu(hwnd);
+            
+            if (hMenu == IntPtr.Zero)
             {
-                _logger.LogDebug("No menu found for window");
+                _logger.LogDebug("No menu found for window (UseSystemMenu: {UseSystemMenu})", target.UseSystemMenu);
                 return Task.FromResult<IReadOnlyList<MenuItemInfo>>(items);
             }
 
-            int itemCount = Win32.GetMenuItemCount(hMenu);
-            for (int i = 0; i < itemCount; i++)
-            {
-                var itemInfo = GetMenuItemInfo(hMenu, i, 0);
-                if (itemInfo != null)
-                {
-                    items.Add(itemInfo);
-                }
-            }
+            // Recursively collect menu items including submenus
+            CollectMenuItemsRecursive(hMenu, items, 0);
         }
         catch (Exception ex)
         {
@@ -185,6 +182,37 @@ public sealed class WindowsMenuDiscoveryService : IMenuDiscoveryService
             Id: $"menu_{pos}_{index}",
             Label: label.Replace("&", ""),
             Shortcut: null,
+            IsEnabled: (mii.fState & 0x00000002) == 0,
+            IsChecked: (mii.fState & 0x00000008) != 0,
+            HasSubmenu: mii.hSubMenu != IntPtr.Zero,
+            Position: (int)pos + index);
+    }
+
+    private void CollectMenuItemsRecursive(nint hMenu, List<MenuItemInfo> items, uint pos)
+    {
+        try
+        {
+            int itemCount = Win32.GetMenuItemCount(hMenu);
+            for (int i = 0; i < itemCount; i++)
+            {
+                var itemInfo = GetMenuItemInfo(hMenu, i, pos);
+                if (itemInfo != null)
+                {
+                    items.Add(itemInfo);
+                    // Recursively collect submenu items
+                    var subMenu = Win32.GetSubMenu(hMenu, i);
+                    if (subMenu != IntPtr.Zero)
+                    {
+                        CollectMenuItemsRecursive(subMenu, items, (uint)items.Count);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error recursively collecting menu items");
+        }
+    }
             IsEnabled: (mii.fState & 0x0001) == 0,
             IsChecked: (mii.fState & 0x0002) != 0,
             HasSubmenu: mii.hSubMenu != 0,
@@ -244,6 +272,9 @@ internal static class Win32
 
     [DllImport("user32.dll")]
     public static extern nint GetMenu(nint hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern nint GetSystemMenu(nint hWnd, [MarshalAs(UnmanagedType.Bool)] bool bRevert);
 
     [DllImport("user32.dll")]
     public static extern int GetMenuItemCount(nint hMenu);

@@ -444,6 +444,8 @@ public class MainViewModel : ObservableObject
                     ChatMessages.Add(new ChatMessageEntry("tool",
                         ToolFormatter.FormatCall(evt.ToolName ?? "unknown", evt.ToolArgs),
                         DateTimeOffset.Now));
+                    // Persist tool call to session
+                    _sessionStore.AddToolCall(evt.ToolName ?? "unknown", evt.ToolArgs);
                     break;
 
                 case AgentEventKind.ToolCallCompleted:
@@ -462,6 +464,10 @@ public class MainViewModel : ObservableObject
                             Duration = evt.Duration,
                         };
                     }
+                    // Persist tool result to session
+                    var toolName = evt.ToolName ?? "unknown";
+                    var isSuccess = !string.IsNullOrEmpty(evt.ToolResult) && !evt.ToolResult.StartsWith("Error:");
+                    _sessionStore.UpdateToolCallResult(toolName, evt.ToolResult, evt.Duration, isSuccess);
                     break;
 
                 case AgentEventKind.AssistantMessage:

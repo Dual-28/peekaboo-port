@@ -105,6 +105,32 @@ public class SessionStore
         Save();
     }
 
+    public void AddToolCall(string name, string? arguments)
+    {
+        if (CurrentSession == null) return;
+        var msg = new ConversationMessage("assistant", $"[TOOL_CALL:{name}]", DateTimeOffset.Now,
+            new List<ToolCallInfo> { new ToolCallInfo(name, arguments, null, "running", null) });
+        CurrentSession.Messages.Add(msg);
+        Save();
+    }
+
+    public void UpdateToolCallResult(string name, string? result, TimeSpan? duration, bool success)
+    {
+        if (CurrentSession == null) return;
+        // Find the last tool call message
+        for (int i = CurrentSession.Messages.Count - 1; i >= 0; i--)
+        {
+            var msg = CurrentSession.Messages[i];
+            if (msg.ToolCalls != null && msg.ToolCalls.Count > 0)
+            {
+                var toolCall = msg.ToolCalls[0];
+                msg.ToolCalls[0] = toolCall with { Result = result, Status = success ? "completed" : "failed", Duration = duration };
+                Save();
+                return;
+            }
+        }
+    }
+
     public void UpdateTitle(string title)
     {
         if (CurrentSession == null) return;
