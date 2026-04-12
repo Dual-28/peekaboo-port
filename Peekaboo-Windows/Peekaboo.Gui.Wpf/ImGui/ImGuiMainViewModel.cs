@@ -78,9 +78,9 @@ public class ImGuiMainViewModel
     public void Initialize()
     {
         LoadSessions();
-        _ = LoadRunningApps();
-        _ = LoadOpenWindows();
-        _ = LoadPermissions();
+        _ = Task.Run(LoadRunningApps);
+        _ = Task.Run(LoadOpenWindows);
+        _ = Task.Run(LoadPermissions);
     }
 
     public void Shutdown()
@@ -156,9 +156,21 @@ public class ImGuiMainViewModel
 
     public void Render()
     {
+        RenderStatusWindow();
         UpdateSidebarAnimation();
         RenderSidebar();
         RenderMainContent();
+    }
+
+    private void RenderStatusWindow()
+    {
+        ImGui.SetNextWindowPos(new Vector2(12, 12), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSize(new Vector2(360, 120), ImGuiCond.FirstUseEver);
+        ImGui.Begin("Peekaboo");
+        ImGui.Text("Peekaboo ImGui");
+        ImGui.Text($"Provider: {_settings.SelectedProvider}");
+        ImGui.Text(PermissionStatus);
+        ImGui.End();
     }
 
     private void UpdateSidebarAnimation()
@@ -174,30 +186,24 @@ public class ImGuiMainViewModel
         var io = ImGui.GetIO();
         var pos = ImGui.GetWindowPos();
         var drawList = ImGui.GetWindowDrawList();
+        var sidebarPos = Vector2.Zero;
 
         float windowHeight = io.DisplaySize.Y;
         
         PushStyleVars();
         
         ImGui.SetNextWindowSize(new Vector2(_sidebarWidth + 20, windowHeight));
-        ImGui.SetNextWindowPosition(new Vector2(0, 0));
+        ImGui.SetNextWindowPos(new Vector2(0, 0));
         
         ImGui.Begin("##sidebar", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar);
         {
-            var sidebarPos = ImGui.GetWindowPos();
+            sidebarPos = ImGui.GetWindowPos();
             
             drawList.AddRectFilled(
                 sidebarPos,
                 new Vector2(sidebarPos.X + _sidebarWidth, sidebarPos.Y + windowHeight),
                 ImGui.GetColorU32(new Vector4(0.078f, 0.078f, 0.098f, 1f)),
-                8, ImDrawCornerFlags.Left);
-            
-            float accentAlpha = _isExpanded ? 250 : 0;
-            
-            if (drawList.CmdBuffer.Count > 0)
-            {
-                var lastCmd = drawList.CmdBuffer.Back;
-            }
+                8, ImDrawFlags.RoundCornersLeft);
             
             DrawLogo(sidebarPos);
             
@@ -230,11 +236,11 @@ public class ImGuiMainViewModel
                 }
                 
                 ImGui.SetCursorPos(new Vector2(15, 500));
-                ImGui.BeginChild("##sessions", new Vector2(_sidebarWidth - 20, 120), true);
+                ImGui.BeginChild("##sessions", new Vector2(_sidebarWidth - 20, 120), ImGuiChildFlags.Borders);
                 {
                     foreach (var session in Sessions)
                     {
-                        if (ImGui.Selectable(session.Title, false, ImGuiSelectableFlags.SpanAvailWidth))
+                        if (ImGui.Selectable(session.Title, false, ImGuiSelectableFlags.SpanAllColumns))
                         {
                             _sessionStore.SelectSession(session.Id);
                             LoadCurrentSessionMessages();
@@ -256,7 +262,7 @@ public class ImGuiMainViewModel
             if (io.MousePos.X > pos.X && io.MousePos.X < pos.X + _sidebarWidth + 10 &&
                 io.MousePos.Y > 5 && io.MousePos.Y < windowHeight - 10)
             {
-                ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeHorizontal);
+                ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeEW);
             }
         }
         ImGui.End();
@@ -359,7 +365,7 @@ public class ImGuiMainViewModel
         float mainHeight = io.DisplaySize.Y;
         
         ImGui.SetNextWindowSize(new Vector2(mainWidth, mainHeight));
-        ImGui.SetNextWindowPosition(new Vector2(mainX, 0));
+        ImGui.SetNextWindowPos(new Vector2(mainX, 0));
         
         ImGui.Begin("##main", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse);
         {
@@ -389,7 +395,7 @@ public class ImGuiMainViewModel
             
             ImGui.SetCursorPos(new Vector2(20, 80));
             float chatHeight = mainHeight - 180;
-            ImGui.BeginChild("##chat", new Vector2(mainWidth - 40, chatHeight), true);
+            ImGui.BeginChild("##chat", new Vector2(mainWidth - 40, chatHeight), ImGuiChildFlags.Borders);
             {
                 foreach (var msg in ChatMessages)
                 {
@@ -399,7 +405,7 @@ public class ImGuiMainViewModel
             ImGui.EndChild();
             
             ImGui.SetCursorPos(new Vector2(20, mainHeight - 90));
-            ImGui.BeginChild("##inputarea", new Vector2(mainWidth - 120, 60), true);
+            ImGui.BeginChild("##inputarea", new Vector2(mainWidth - 120, 60), ImGuiChildFlags.Borders);
             {
                 ImGui.InputTextMultiline("##input", ref _userInput, 500, new Vector2(mainWidth - 140, 50));
             }
@@ -477,7 +483,7 @@ public class ImGuiMainViewModel
     private void RenderToolHistoryPanel(float x, float y, float width, int height)
     {
         ImGui.SetNextWindowSize(new Vector2(width, height));
-        ImGui.SetNextWindowPosition(new Vector2(x, y));
+        ImGui.SetNextWindowPos(new Vector2(x, y));
         
         ImGui.Begin("##toolhistory", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse);
         {
@@ -499,7 +505,7 @@ public class ImGuiMainViewModel
             }
             
             ImGui.SetCursorPos(new Vector2(10, 60));
-            ImGui.BeginChild("##toollist", new Vector2(width - 20, height - 70), true);
+            ImGui.BeginChild("##toollist", new Vector2(width - 20, height - 70), ImGuiChildFlags.Borders);
             {
                 foreach (var tool in ToolHistory)
                 {

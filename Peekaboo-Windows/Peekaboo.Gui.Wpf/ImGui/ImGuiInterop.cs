@@ -2,18 +2,16 @@ using System;
 using System.Runtime.InteropServices;
 using System.Numerics;
 using ImGuiNET;
-using Silk.NET.GLFW;
+using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
-using Silk.NET.Input;
 
 namespace Peekaboo.Gui.Wpf.Rendering;
 
 public static class ImGuiInterop
 {
-    private static Glfw? _glfw;
-    private static IWindow? _window;
     private static GL? _gl;
+    private static IInputContext? _inputContext;
     private static bool _initialized;
 
     private static int _shaderProgram;
@@ -50,19 +48,12 @@ void main() {
 
         try
         {
-            _window = window;
             _gl = gl;
-            _glfw = Glfw.GetApi();
+            _inputContext = window.CreateInput();
 
             var io = ImGui.GetIO();
             io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
-            io.BackendFlags |= ImGuiBackendFlags.PlatformHasViewports;
             io.BackendFlags |= ImGuiBackendFlags.HasMouseCursors;
-            io.BackendFlags |= ImGuiBackendFlags.HasSetMousePos;
-
-            io.SetClipboardTextFn = SetClipboardText;
-            io.GetClipboardTextFn = GetClipboardText;
-            io.ClipboardUserData = IntPtr.Zero;
 
             CreateDeviceObjects();
 
@@ -82,17 +73,13 @@ void main() {
 
         var io = ImGui.GetIO();
 
-        byte[] pixels;
+        IntPtr pixels;
         int width, height;
-        ImGuiNative.ImFontAtlas_GetTexDataAsRGBA32(io.Fonts.NativePtr, out pixels, out width, out height, null);
+        io.Fonts.GetTexDataAsRGBA32(out pixels, out width, out height);
 
         _textureId = _gl.GenTexture();
         _gl.BindTexture(TextureTarget.Texture2D, _textureId);
-        
-        fixed (byte* pixelsPtr = pixels)
-        {
-            _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba, (uint)width, (uint)height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixelsPtr);
-        }
+        _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba, (uint)width, (uint)height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels.ToPointer());
         
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -111,11 +98,11 @@ void main() {
         _gl.BindVertexArray((uint)_vao);
         _gl.BindBuffer(BufferTargetARB.ArrayBuffer, (uint)_vbo);
         _gl.EnableVertexAttribArray(0);
-        _gl.VertexAttribPointer(0, 2, VertexAttribType.Float, false, (uint)sizeof(ImDrawVert), (void*)0);
+        _gl.VertexAttribPointer(0, 2, GLEnum.Float, false, (uint)sizeof(ImDrawVert), (void*)0);
         _gl.EnableVertexAttribArray(1);
-        _gl.VertexAttribPointer(1, 2, VertexAttribType.Float, false, (uint)sizeof(ImDrawVert), (void*)(2 * sizeof(float)));
+        _gl.VertexAttribPointer(1, 2, GLEnum.Float, false, (uint)sizeof(ImDrawVert), (void*)(2 * sizeof(float)));
         _gl.EnableVertexAttribArray(2);
-        _gl.VertexAttribPointer(2, 4, VertexAttribType.UnsignedByte, true, (uint)sizeof(ImDrawVert), (void*)(4 * sizeof(float)));
+        _gl.VertexAttribPointer(2, 4, GLEnum.UnsignedByte, true, (uint)sizeof(ImDrawVert), (void*)(4 * sizeof(float)));
 
         _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, (uint)_ebo);
         _gl.BindVertexArray(0);
@@ -154,14 +141,14 @@ void main() {
 
         io.DeltaTime = 1f / 60f;
 
-        var mousePos = window.MousePosition;
-        io.MousePos = new Vector2(mousePos.X, mousePos.Y);
-
-        if (window.Mouse != null)
+        var mouse = _inputContext?.Mice.FirstOrDefault();
+        if (mouse != null)
         {
+            io.MousePos = mouse.Position;
+
             for (int i = 0; i < 3; i++)
             {
-                io.MouseDown[i] = window.Mouse.IsButtonPressed((MouseButton)i);
+                io.MouseDown[i] = mouse.IsButtonPressed((MouseButton)i);
             }
         }
 
@@ -170,8 +157,10 @@ void main() {
 
     public static unsafe void Render(GL gl)
     {
+        ImGui.Render();
+
         var drawData = ImGui.GetDrawData();
-        if (drawData.CmdListsCount == 0) return;
+        if (drawData.NativePtr == null || drawData.CmdListsCount == 0) return;
 
         var io = ImGui.GetIO();
 
@@ -187,14 +176,17 @@ void main() {
         };
 
         gl.Enable(EnableCap.Blend);
-        gl.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorFunc.OneMinusSrcAlpha);
+        gl.BlendFunc(GLEnum.SrcAlpha, GLEnum.OneMinusSrcAlpha);
         gl.Disable(EnableCap.CullFace);
         gl.Disable(EnableCap.DepthTest);
         gl.Enable(EnableCap.ScissorTest);
 
         gl.UseProgram((uint)_shaderProgram);
         int loc = gl.GetUniformLocation((uint)_shaderProgram, "ProjMtx");
-        gl.Uniform1(loc, projMtx);
+        fixed (float* projPtr = projMtx)
+        {
+            gl.UniformMatrix4(loc, 1, false, projPtr);
+        }
 
         gl.ActiveTexture(TextureUnit.Texture0);
         gl.BindTexture(TextureTarget.Texture2D, _textureId);
@@ -203,27 +195,20 @@ void main() {
 
         for (int n = 0; n < drawData.CmdListsCount; n++)
         {
-            var cmdList = drawData.GetCmdList(n);
-            if (cmdList == null) continue;
+            var cmdList = drawData.CmdLists[n];
 
             var vtxBuffer = cmdList.VtxBuffer;
             var idxBuffer = cmdList.IdxBuffer;
 
             gl.BindBuffer(BufferTargetARB.ArrayBuffer, (uint)_vbo);
-            fixed (ImDrawVert* vtxPtr = vtxBuffer.Data)
-            {
-                gl.BufferData(BufferTargetARB.ArrayBuffer, vtxBuffer.Size * sizeof(ImDrawVert), vtxPtr, BufferUsageARB.DynamicDraw);
-            }
+            gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(vtxBuffer.Size * sizeof(ImDrawVert)), vtxBuffer.Data.ToPointer(), BufferUsageARB.DynamicDraw);
 
             gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, (uint)_ebo);
-            fixed (ushort* idxPtr = idxBuffer.Data)
-            {
-                gl.BufferData(BufferTargetARB.ElementArrayBuffer, idxBuffer.Size * sizeof(ushort), idxPtr, BufferUsageARB.DynamicDraw);
-            }
+            gl.BufferData(BufferTargetARB.ElementArrayBuffer, (nuint)(idxBuffer.Size * sizeof(ushort)), idxBuffer.Data.ToPointer(), BufferUsageARB.DynamicDraw);
 
             for (int cmdIdx = 0; cmdIdx < cmdList.CmdBuffer.Size; cmdIdx++)
             {
-                var cmd = cmdList.GetCmdBuffer<ImDrawCmd>(cmdIdx);
+                var cmd = cmdList.CmdBuffer[cmdIdx];
 
                 if (cmd.UserCallback != IntPtr.Zero) continue;
 
@@ -232,14 +217,14 @@ void main() {
                 float right = drawData.DisplayPos.X + cmd.ClipRect.Z;
                 float bottom = drawData.DisplayPos.Y + cmd.ClipRect.W;
 
-                gl.Scissor((int)left, (int)(io.DisplaySize.Y - bottom), (int)(right - left), (int)(bottom - top));
+                gl.Scissor((int)Math.Max(0, left), (int)Math.Max(0, io.DisplaySize.Y - bottom), (uint)Math.Max(0, right - left), (uint)Math.Max(0, bottom - top));
 
                 if (cmd.TextureId != IntPtr.Zero)
                 {
                     gl.BindTexture(TextureTarget.Texture2D, (uint)cmd.TextureId.ToPointer());
                 }
 
-                gl.DrawElementsBaseVertex(PrimitiveType.Triangles, (uint)cmd.ElemCount, DrawElementsType.UnsignedShort, (void*)(cmd.IdxOffset * sizeof(ushort)), (int)cmd.VtxOffset);
+                gl.DrawElementsBaseVertex(PrimitiveType.Triangles, cmd.ElemCount, DrawElementsType.UnsignedShort, (void*)(cmd.IdxOffset * sizeof(ushort)), (int)cmd.VtxOffset);
             }
         }
 
@@ -268,15 +253,5 @@ void main() {
         _shaderProgram = 0;
 
         _initialized = false;
-    }
-
-    private static string GetClipboardText(IntPtr user_data)
-    {
-        return _glfw?.GetClipboardString(null) ?? "";
-    }
-
-    private static void SetClipboardText(IntPtr user_data, string text)
-    {
-        _glfw?.SetClipboardString(null, text);
     }
 }

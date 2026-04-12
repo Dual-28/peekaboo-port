@@ -9,6 +9,7 @@ using Peekaboo.Gui.Wpf.Sessions;
 using Peekaboo.Gui.Wpf.Rendering;
 using Peekaboo.Platform.Windows.Gui;
 using Peekaboo.Platform.Windows.Services;
+using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
@@ -41,8 +42,8 @@ public static class ImGuiProgram
 
         var options = WindowOptions.Default;
         options.Title = "Peekaboo - Windows Automation Agent";
-        options.Size = new System.Numerics.Vector2i(1280, 800);
-        options.Position = new System.Numerics.Vector2i(100, 100);
+        options.Size = new Vector2D<int>(1280, 800);
+        options.Position = new Vector2D<int>(100, 100);
         options.VSync = true;
 
         using var window = Silk.NET.Windowing.Window.Create(options);
@@ -54,8 +55,8 @@ public static class ImGuiProgram
             
             try
             {
-                ImGuiInterop.Init(window, gl);
                 imGuiManager.Initialize();
+                ImGuiInterop.Init(window, gl);
                 viewModel.Initialize();
                 Log("ImGui initialized successfully");
             }
@@ -76,7 +77,6 @@ public static class ImGuiProgram
                 gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
                 ImGuiInterop.NewFrame(window);
-                imGuiManager.NewFrame();
                 
                 viewModel.Render();
                 
@@ -84,7 +84,7 @@ public static class ImGuiProgram
             }
             catch (Exception ex)
             {
-                Log($"Render error: {ex.Message}");
+                Log($"Render error: {ex.Message}\n{ex.StackTrace}");
             }
         };
 
