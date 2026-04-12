@@ -84,6 +84,9 @@ public sealed class WindowsWindowManagementService : IWindowManagementService
             case WindowTarget.WindowId wid:
                 return new[] { await GetWindowInfoAsync((nint)wid.Id, 0, ct) };
 
+            case WindowTarget.All:
+                return await ListAllWindowsAsync(ct);
+
             default:
                 throw new NotImplementedException($"WindowTarget type {target.GetType().Name} not supported for listing");
         }
@@ -147,8 +150,34 @@ public sealed class WindowsWindowManagementService : IWindowManagementService
             WindowTarget.ApplicationAndTitle at => await FindWindowForAppAndTitleAsync(at.AppName, at.TitleText, ct),
             WindowTarget.Title title => await FindWindowByTitleAsync(title.Text, ct),
             WindowTarget.Index idx => await FindWindowByIndexAsync(idx.AppName, idx.WindowIndex, ct),
+            WindowTarget.All => throw new PeekabooException("The 'all' window target is only valid for listing windows"),
             _ => throw new PeekabooException($"Unsupported window target: {target.GetType().Name}")
         };
+    }
+
+    private async Task<IReadOnlyList<ServiceWindowInfo>> ListAllWindowsAsync(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        var windows = new List<ServiceWindowInfo>();
+        var foreground = NativeMethods.GetForegroundWindow();
+        int index = 0;
+
+        NativeMethods.EnumWindows((hWnd, _) =>
+        {
+            if (!NativeMethods.IsWindowVisible(hWnd)) return true;
+
+            var length = NativeMethods.GetWindowTextLength(hWnd);
+            if (length == 0) return true;
+
+            windows.Add(GetWindowInfoAsync(hWnd, index++, ct).GetAwaiter().GetResult() with
+            {
+                IsMainWindow = hWnd == foreground,
+            });
+            return true;
+        }, nint.Zero);
+
+        await Task.CompletedTask;
+        return windows;
     }
 
     private async Task<nint> FindWindowForAppAsync(string appName, CancellationToken ct)

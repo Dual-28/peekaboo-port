@@ -90,14 +90,11 @@ public sealed class WindowsDialogService : IDialogService
 
         if (comboHwnd == 0)
         {
-            _logger.LogWarning("Could not find filter combo box");
-            return;
+            throw new InvalidOperationException("Could not find file type filter control");
         }
 
-        // Select the filter - typically index corresponds to filter string
-        // For simplicity, we'll just note that filters are usually pre-defined
-        _logger.LogInformation("Filter setting not fully implemented - filters typically pre-defined");
-        await Task.Delay(50, ct);
+        throw new NotSupportedException(
+            "Changing an existing Windows file dialog filter is not implemented. Use dialog_set_path and dialog_click_button, or choose the filter manually.");
     }
 
     public async Task ClickButtonAsync(DialogButton button, CancellationToken ct = default)

@@ -33,28 +33,28 @@ public sealed class WindowsVirtualDesktopService : IVirtualDesktopService
     public Task SwitchToDesktopAsync(string desktopId, CancellationToken ct = default)
     {
         _logger.LogInformation("Switching to desktop: {DesktopId}", desktopId);
-        // Requires IVirtualDesktopManager::GetDesktops() and SetDesktop()
-        return Task.CompletedTask;
+        return Task.FromException(new NotSupportedException(
+            "Switching virtual desktops is not implemented in this Windows build. space_list can report the current desktop placeholder only."));
     }
 
     public Task<string> CreateDesktopAsync(CancellationToken ct = default)
     {
         _logger.LogInformation("Creating new virtual desktop");
-        // Requires IVirtualDesktopManager::CreateDesktop()
-        return Task.FromResult($"desktop-{Guid.NewGuid():N}");
+        return Task.FromException<string>(new NotSupportedException(
+            "Creating virtual desktops is not implemented in this Windows build."));
     }
 
     public Task DeleteDesktopAsync(string desktopId, CancellationToken ct = default)
     {
         _logger.LogInformation("Deleting desktop: {DesktopId}", desktopId);
-        // Requires IVirtualDesktopManager::RemoveDesktop()
-        return Task.CompletedTask;
+        return Task.FromException(new NotSupportedException(
+            "Deleting virtual desktops is not implemented in this Windows build."));
     }
 
     public Task MoveWindowToDesktopAsync(string windowTitle, string desktopId, CancellationToken ct = default)
     {
         _logger.LogInformation("Moving window '{WindowTitle}' to desktop {DesktopId}", windowTitle, desktopId);
-        // Requires IVirtualDesktopManager::MoveWindowToDesktop()
-        return Task.CompletedTask;
+        return Task.FromException(new NotSupportedException(
+            "Moving windows between virtual desktops is not implemented in this Windows build."));
     }
 }
