@@ -737,6 +737,10 @@ public static class Program
             .AddSingleton<IWindowManagementService, WindowsWindowManagementService>()
             .AddSingleton<IClipboardService, WindowsClipboardService>()
             .AddSingleton<IPermissionsService, WindowsPermissionsService>()
+            .AddSingleton<IMenuDiscoveryService, WindowsMenuDiscoveryService>()
+            .AddSingleton<ITaskbarService, WindowsTaskbarService>()
+            .AddSingleton<IDialogService, WindowsDialogService>()
+            .AddSingleton<IVirtualDesktopService, WindowsVirtualDesktopService>()
             .BuildServiceProvider();
     }
 }
