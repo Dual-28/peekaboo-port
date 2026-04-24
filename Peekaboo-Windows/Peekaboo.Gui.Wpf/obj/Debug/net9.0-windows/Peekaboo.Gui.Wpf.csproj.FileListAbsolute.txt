@@ -63,16 +63,6 @@ C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.G
 C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\bin\Debug\net9.0-windows\Peekaboo.Core.pdb
 C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\bin\Debug\net9.0-windows\Peekaboo.Platform.Windows.pdb
 C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Peekaboo.Gui.Wpf.csproj.AssemblyReference.cache
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Views\SettingsWindow.baml
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Views\MainWindow.g.cs
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Views\SettingsWindow.g.cs
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\App.g.cs
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\GeneratedInternalTypeHelper.g.cs
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Peekaboo.Gui.Wpf_MarkupCompile.cache
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Peekaboo.Gui.Wpf_MarkupCompile.lref
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\App.baml
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Views\MainWindow.baml
-C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Peekaboo.Gui.Wpf.g.resources
 C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Peekaboo.Gui.Wpf.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Peekaboo.Gui.Wpf.AssemblyInfoInputs.cache
 C:\Users\dualtach\Documents\AASOLITUDE\Peekaboo-main\Peekaboo-Windows\Peekaboo.Gui.Wpf\obj\Debug\net9.0-windows\Peekaboo.Gui.Wpf.AssemblyInfo.cs

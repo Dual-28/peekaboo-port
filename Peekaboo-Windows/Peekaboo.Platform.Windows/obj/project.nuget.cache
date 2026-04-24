@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "EgQy+RUC1tA=",
+  "dgSpecHash": "nWrtDGJ36PY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
+  "projectFilePath": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dualtach\\.nuget\\packages\\flaui.core\\5.0.0\\flaui.core.5.0.0.nupkg.sha512",
     "C:\\Users\\dualtach\\.nuget\\packages\\flaui.uia3\\5.0.0\\flaui.uia3.5.0.0.nupkg.sha512",

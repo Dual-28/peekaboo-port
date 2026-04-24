@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj": {}
+    "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj": {
+    "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj",
+        "projectUniqueName": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj",
         "projectName": "Peekaboo.Core",
-        "projectPath": "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj",
+        "projectPath": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj",
         "packagesPath": "C:\\Users\\dualtach\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\obj\\",
+        "outputPath": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -69,14 +69,14 @@
         }
       }
     },
-    "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj": {
+    "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
+        "projectUniqueName": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
         "projectName": "Peekaboo.Platform.Windows",
-        "projectPath": "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
+        "projectPath": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\Peekaboo.Platform.Windows.csproj",
         "packagesPath": "C:\\Users\\dualtach\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\obj\\",
+        "outputPath": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Platform.Windows\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -97,8 +97,8 @@
           "net9.0-windows7.0": {
             "targetAlias": "net9.0-windows",
             "projectReferences": {
-              "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj": {
-                "projectPath": "C:\\Users\\dualtach\\Documents\\Projects\\active\\finance\\git\\.vibe-kanban-workspaces\\9b59-merge-and-push-e\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj"
+              "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj": {
+                "projectPath": "C:\\Users\\dualtach\\Documents\\AASOLITUDE\\Peekaboo-main\\Peekaboo-Windows\\Peekaboo.Core\\Peekaboo.Core.csproj"
               }
             }
           }
